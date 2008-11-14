@@ -40,8 +40,7 @@
 | NO TRAILING SLASH!
 |
 */
-	$application_folder = "/Users/kyleh/Documents/webdev/freshbooks/tickapi/application";
-
+  $application_folder = "application";
 /*
 |===============================================================
 | END OF USER CONFIGURABLE SETTINGS

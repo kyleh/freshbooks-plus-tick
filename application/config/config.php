@@ -11,7 +11,14 @@
 |	http://example.com/
 |
 */
+//base url production server
+//$config['base_url']	= "";
+
+//base url local development server
 $config['base_url']	= "http://localhost/freshbooks/tickapi/";
+
+//base url remote development server
+//$config['base_url']	= "http://www.devinprogress.com/tickapibeta/";
 
 /*
 |--------------------------------------------------------------------------
