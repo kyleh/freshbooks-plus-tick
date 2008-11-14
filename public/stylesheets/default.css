@@ -276,6 +276,15 @@ span input {
 	font-weight: normal;
 	font-family: Arial, Helvetica, sans-serif;
 }
+
+h3 {
+color:#0D83DD;
+font-size:18px;
+font-weight:bold;
+line-height:30px;
+padding-bottom:5px;
+}
+
 #footer {
 	position: relative;
 	height: 60px;
