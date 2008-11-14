@@ -109,7 +109,6 @@ if ($ts_entries) {
             All Line Items created for this Invoice will be summarized by <strong>Task</strong>.</p>
             <div class="border_button">
 			<?php echo form_open('invoice/create_invoice', array('class' => 'form_button')); ?>
-			<form action="<?php echo(base_url()); ?>index.php/createinvoice" method="post" class="form_button">
 				<input type="hidden" name="invoice_type" value="summary" />
 				<input type="hidden" name="client_name" value="<?php echo $ts_entries[0]['client_name']; ?>" />
 				<input type="hidden" name="total_hours" value="<?php echo $total_hours; ?>" />

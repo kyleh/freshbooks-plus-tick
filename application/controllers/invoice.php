@@ -65,6 +65,7 @@ Class Invoice extends Controller
 		$data['heading'] = 'Create Invoice Results';
 		$data['error'] = '';
 		$data['invoice_results'] = '';
+		$data['no_client_match'] = '';
 		$data['invoice_url'] = '';
 		
 		//get FB clients
@@ -76,7 +77,7 @@ Class Invoice extends Controller
 			return;
 		}
 		//use match client method to match client name from TS to client name from FB
-		$ts_client_name = trim($this->input->post('client_name',TRUE));
+		$ts_client_name = trim($this->input->post('client_name'));
 		//if match returns FB client id else returns false
 		$client_id = $this->invoiceapi->matchClients($fbclients, $ts_client_name);
 		//exit on API error
@@ -87,12 +88,20 @@ Class Invoice extends Controller
 		}
 		
 		if (!$client_id) {
-			$data['invoice_results'] = 'No Client Match Found - Your Tick client was not found in FreshBooks.  Please make sure that you use the same client name for both FreshBooks and Tick.';
+			$data['no_client_match'] = 'No Client Match Found - Your Tick client was not found in FreshBooks.  Please make sure that you use the same client name for both FreshBooks and Tick.';
+			$post_data = array(
+					'client_name' => $this->input->post('client_name'),
+					'project_name' => $this->input->post('project_name'),
+					'total_hours' => $this->input->post('total_hours'),
+					'entry_ids' => $this->input->post('entry_ids'),
+					'invoice_type' => $this->input->post('invoice_type'),
+				);
+			$data['post_data'] = $post_data;
 			$this->load->view('invoice/invoice_results_view.php', $data);
 			return;
 		}
 		//Set project rate
-		$project_name = trim($this->input->post('project_name',TRUE));
+		$project_name = trim($this->input->post('project_name'));
 		$project_rate = $this->invoiceapi->getProjectRate($client_id, $project_name);
 		//exit on API error
 		if (preg_match("/Error/", $project_rate)) {
@@ -106,9 +115,9 @@ Class Invoice extends Controller
 			case 'summary':
 				$client_data = array(
 					'client_id' => $client_id, 
-					'client_name' => $this->input->post('client_name',TRUE), 
-					'total_hours' => $this->input->post('total_hours',TRUE),
-					'project_name' => $this->input->post('project_name',TRUE),
+					'client_name' => $this->input->post('client_name'), 
+					'total_hours' => $this->input->post('total_hours'),
+					'project_name' => $this->input->post('project_name'),
 					'project_rate' => $project_rate,
 					);
 				//attempt to create invoice in FB	
