@@ -2,3 +2,5 @@
 application/config/config.php
 application/config/database.php
 index.php
+system/logs
+public/assets

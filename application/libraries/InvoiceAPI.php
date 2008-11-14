@@ -32,7 +32,7 @@ Class InvoiceAPI
 		curl_close($ch);
 		
 		if (preg_match("/not valid/", $result)) {
-			return 'Error: '.$result;
+			return 'Tick Error: '.$result.' Please check you Tick settings and try again.';
 		}elseif(preg_match("/xml/", $result)){
 			return simplexml_load_string($result);
 		}else{
@@ -68,13 +68,6 @@ Class InvoiceAPI
 			}
 		}
 	}
-	
-	//TODO: Remove method	
-	// function getOpenProjects()
-	// {
-	// 	$url = "http://mendtechnologies.tickspot.com/api/projects?open=true";
-	// 	return $this->loadxml($url);
-	// }
 	
 	//Returns all open entries - takes optional project id
 	function getAllOpenEntries($id = 0)

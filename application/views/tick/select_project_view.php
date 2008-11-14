@@ -7,7 +7,7 @@
 	<div class="border">
 	<?php if ($error): ?>
 		<p><?php echo $error; ?></p>
-	<?php endif ?>	
+	<?php else: ?>
 		
 	<?php if ($projects): ?>
 		<table cellspacing="0" cellpadding="0">
@@ -45,6 +45,7 @@
 	<?php endif ?>
 	</div>
 
+	<?php endif //endif errors?>
 </div><!-- end div content -->
 
 <!-- load the footer -->
