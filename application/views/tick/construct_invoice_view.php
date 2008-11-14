@@ -114,7 +114,7 @@ if ($ts_entries) {
 				<input type="hidden" name="total_hours" value="<?php echo $total_hours; ?>" />
 				<input type="hidden" name="entry_ids" value="<?php echo $entry_ids; ?>" />
 				<input type="hidden" name="project_name" value="<?php echo $ts_entries[0]['project_name']; ?>" />
-        <button type="submit" name="submit_invoice">Create<br />Invoice</button>
+        <button type="submit" name="submit_invoice" onclick="dis(this);">Create<br />Invoice</button>
 			</form>
             </div>
       </div>
@@ -128,7 +128,7 @@ if ($ts_entries) {
 				<input type="hidden" name="total_hours" value="<?php echo $total_hours; ?>" />
 				<input type="hidden" name="entry_ids" value="<?php echo $entry_ids; ?>" />
 				<input type="hidden" name="project_name" value="<?php echo $ts_entries[0]['project_name']; ?>" />
-        <button type="submit" name="submit_invoice">Create<br />Invoice</button>
+        <button type="submit" name="submit_invoice" onclick="dis(this);">Create<br />Invoice</button>
 			</form>
             </div>
         </div>  

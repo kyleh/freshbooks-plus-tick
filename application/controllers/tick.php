@@ -162,29 +162,23 @@ Class Tick extends Controller{
 		$this->load->view('tick/construct_invoice_view.php', $data);
 	}
 
-	function getinvoiceids()
-	{
-		//check for login
-		if ($this->_check_login()) {
-			$data['navigation'] = TRUE;	
-		}
-		$data['title'] = 'Tick Invoice Generator';
-		$data['heading'] = 'Create Invoice Results';
-		$data['error'] = '';
-		
-		$data['jt_status'] = $this->_updateJoinTable();
-		
-		$this->load->model('Entries_model', 'entries');
-		$fb_ids = $this->entries->getInvoiceIds();
-		
-		$data['ids'] = $fb_ids;
-		$this->load->view('invoice/ids_view', $data);
-		
-		
-		
-		
-		
-		
-	}
+	// function getinvoiceids()
+	// {
+	// 	//check for login
+	// 	if ($this->_check_login()) {
+	// 		$data['navigation'] = TRUE;	
+	// 	}
+	// 	$data['title'] = 'Tick Invoice Generator';
+	// 	$data['heading'] = 'Create Invoice Results';
+	// 	$data['error'] = '';
+	// 	
+	// 	$data['jt_status'] = $this->_updateJoinTable();
+	// 	
+	// 	$this->load->model('Entries_model', 'entries');
+	// 	$fb_ids = $this->entries->getInvoiceIds();
+	// 	
+	// 	$data['ids'] = $fb_ids;
+	// 	$this->load->view('invoice/ids_view', $data);
+	// }
 	
 }

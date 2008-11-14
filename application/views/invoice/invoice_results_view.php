@@ -23,7 +23,7 @@
 		<input type="hidden" name="total_hours" value="<?php echo $post_data['total_hours']; ?>" />
 		<input type="hidden" name="entry_ids" value="<?php echo $post_data['entry_ids']; ?>" />
 		<input type="hidden" name="project_name" value="<?php echo $post_data['project_name']; ?>" />
-    <button type="submit" name="submit_invoice">Re-Submit<br />Invoice</button>
+    <button type="submit" name="submit_invoice" onclick="dis(this);">Re-Submit<br />Invoice</button>
 	</form>
 <?php endif ?>	
 

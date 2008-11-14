@@ -5,7 +5,11 @@
 <link rel="stylesheet" type="text/css" href="<?php echo(base_url()); ?>public/stylesheets/default.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="<?php echo(base_url()); ?>public/stylesheets/datepicker.css" media="screen" /> 
 <script src="<?php echo(base_url()); ?>public/javascript/application.js" type="text/javascript"></script>
-
+<script language=”JavaScript” type=”text/javascript”>
+function dis(a){
+a.disabled = “disabled”;
+}
+</script>
 </head>
 <body>
 <div id="wrap">
