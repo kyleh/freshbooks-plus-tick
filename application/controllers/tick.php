@@ -10,7 +10,7 @@ Class Tick extends Controller{
 		$this->output->enable_profiler(TRUE);
 		
 		$params = $this->_get_settings();
-		$this->load->library('InvoiceAPI', $params);
+		$this->load->library('Invoice_api', $params);
 		
 	}
 	
@@ -20,11 +20,14 @@ Class Tick extends Controller{
 	function _check_login()
 	{
 		$loggedin = $this->session->userdata('loggedin');
-		if (!$loggedin) {
-		redirect('user/index');
-		return FALSE;
-		}else{
-		return TRUE;	
+		if ( ! $loggedin)
+		{
+			redirect('user/index');
+			return FALSE;
+		}
+		else
+		{
+			return TRUE;	
 		}
 	}
 	
@@ -32,9 +35,12 @@ Class Tick extends Controller{
 	{
 		$this->load->model('Settings_model','settings');
 		$settings = $this->settings->getSettings();
-		if (!$settings) {
+		if ( ! $settings)
+		{
 			redirect('settings/index');
-		}else{
+		}
+		else
+		{
 			return array(
 							'ts_email' => $settings->tsemail, 
 							'ts_password' => $settings->tspassword,
@@ -45,28 +51,35 @@ Class Tick extends Controller{
 	}
 
 	function _updateJoinTable()
-	 {
+	{
 		$this->load->model('Entries_model', 'entries');
 		$fb_ids = $this->entries->getInvoiceIds();
-		if ($fb_ids) {
-			foreach ($fb_ids as $id) {
+		
+		if ($fb_ids)
+		{
+			foreach ($fb_ids as $id)
+			{
 				$invoice_id = $id->fb_invoice_id;
-				$status = $this->invoiceapi->checkInvoiceStatus($invoice_id);
+				$status = $this->invoiceapi->check_invoice_status($invoice_id);
 				$entries_ids = $this->entries->getEntriesIds($invoice_id);
-				if ($status == 'deleted') {//if deleted change billing status to false and delete join record
-					foreach ($entries_ids as $entry_id) {
-						$mark_not_billed = $this->invoiceapi->changeBilledStatus('false', (integer)$entry_id->ts_entry_id);
+				if ($status == 'deleted')
+				{//if deleted change billing status to false and delete join record
+					foreach ($entries_ids as $entry_id)
+					{
+						$mark_not_billed = $this->invoiceapi->change_billed_status('false', (integer)$entry_id->ts_entry_id);
 						$deleted_entries = $this->entries->deleteEntry((integer)$entry_id->ts_entry_id);
 					}//endforeach
-				}elseif(!$status == 'draft'){//if status is not draft delete join record
-					foreach ($entries_ids as $entry_id) {
-						$deleted_entries = $this->entries->deleteEnrty((integer)$entry_id->ts_entry_id);
+				}
+				elseif(!$status == 'draft')
+				{//if status is not draft delete join record
+					foreach ($entries_ids as $entry_id)
+					{
+						$deleted_entries = $this->entries->deleteEntry((integer)$entry_id->ts_entry_id);
 					}//endforeach
 				}//endif
-			
 			}//end foreach
 		}//endif
-	 }
+	}
 
 	/*
 	/ Functions accessable via URL request
@@ -79,7 +92,8 @@ Class Tick extends Controller{
 	function select_project()
 	{
 		//check for login
-		if ($this->_check_login()) {
+		if ($this->_check_login())
+		{
 			$data['navigation'] = TRUE;	
 		}
 		//Get Invoice Id's from join table delete records if invoice sent
@@ -92,23 +106,26 @@ Class Tick extends Controller{
 		$data['error'] = '';
 		
 		//get open entries in tickspot - group by project - remove duplicates
-		$ts_entries = $this->invoiceapi->getAllOpenEntries();
+		$ts_entries = $this->invoice_api->get_all_open_entries();
 		//exit on API error
-		if (preg_match("/Error/", $ts_entries)) {
+		if (preg_match("/Error/", $ts_entries))
+		{
 			$data['error'] = $ts_entries;
 			$this->load->view('tick/select_project_view', $data);
 			return;
-		}//else{
-			//$ts_entries = simplexml_load_string($ts_entries);
-		//}
+		}
+		
 		//filter open entries for unique projects
 		$projects_with_entries = array();
-		foreach ($ts_entries as $entry){
+		foreach ($ts_entries as $entry)
+		{
 			$project = array('project'=>(string)$entry->project_name, 'project_id'=>(string)$entry->project_id, 'client'=>(string)$entry->client_name);
-			if (!in_array($project, $projects_with_entries, false)) {
+			if ( ! in_array($project, $projects_with_entries, FALSE))
+			{
 				$projects_with_entries[] = $project;
 			}
 		}
+		
 		//assign unique projects array element
 		$data['projects'] = $projects_with_entries;
 		$this->load->view('tick/select_project_view.php', $data);
@@ -131,26 +148,31 @@ Class Tick extends Controller{
 		$start_date = '';
 		$end_date = date('m').'/'.date('t').'/'.date('Y');
 				
-		if ($this->input->post('filter') == 'refresh') {
+		if ($this->input->post('filter') == 'refresh')
+		{
 			$date = $_POST['options'];
 			$start_date = $date['start_date'];
 			$end_date = $date['end_date'];
-			$ts_entries = $this->invoiceapi->getOpenEntries($project_id,$start_date,$end_date);
-			}else{
-				$ts_entries = $this->invoiceapi->getAllOpenEntries($project_id);
-			}
+			$ts_entries = $this->invoice_api->get_open_entries($project_id,$start_date,$end_date);
+		}
+		else
+		{
+			$ts_entries = $this->invoice_api->get_all_open_entries($project_id);
+		}
 		//exit on API error
-		if (preg_match("/Error/", $ts_entries)) {
+		if (preg_match("/Error/", $ts_entries))
+		{
 			$data['error'] = $ts_entries;
 			$this->load->view('tick/select_project', $data);
 			return;
 		}
 		//process entries into mulitdimential array for sorting
-		$processed_entries = $this->invoiceapi->processEntries($ts_entries);
+		$processed_entries = $this->invoice_api->process_entries($ts_entries);
 		$data['ts_entries'] = $processed_entries;
 		//calculate total hours for invoice
 		$total_hours = 0;
-		foreach ($processed_entries as $entry) {
+		foreach ($processed_entries as $entry)
+		{
 			$total_hours = $total_hours + $entry['hours'];
 		}
 		//set project selection variables
@@ -175,7 +197,7 @@ Class Tick extends Controller{
 	// 	$data['jt_status'] = $this->_updateJoinTable();
 	// 	
 	// 	$this->load->model('Entries_model', 'entries');
-	// 	$fb_ids = $this->entries->getInvoiceIds();
+	// 	$fb_ids = $this->entries->get_invoiceIds();
 	// 	
 	// 	$data['ids'] = $fb_ids;
 	// 	$this->load->view('invoice/ids_view', $data);

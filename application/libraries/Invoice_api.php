@@ -5,8 +5,7 @@
 		@author - Kyle Hendricks - Mend Technologies - kyleh@mendtechnologies.com - www.mendtechnologies.com
  */
 
-
-Class InvoiceAPI 
+Class Invoice_api
 {
 	
 	private $fburl;
@@ -31,16 +30,21 @@ Class InvoiceAPI
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
-		if (preg_match("/not valid/", $result)) {
+		if (preg_match("/not valid/", $result))
+		{
 			return 'Tick Error: '.$result.' Please check you Tick settings and try again.';
-		}elseif(preg_match("/xml/", $result)){
+		}
+		elseif(preg_match("/xml/", $result))
+		{
 			return simplexml_load_string($result);
-		}else{
+		}
+		else
+		{
 			return $result;
 		}
 	}
 
-	private function sendXMLRequest($xml)
+	private function send_xml_request($xml)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $this->fburl);
@@ -52,54 +56,84 @@ Class InvoiceAPI
 		curl_close ($ch);
 		
 		//check for non xml result
-		if($result == FALSE){
+		if($result == FALSE)
+		{
 			return 'Error: Unable to connect to FreshBooks API.';
-		}elseif(preg_match("/404 Error: Not Found/", $result) || preg_match("/DOCTYPE/", $result)){
+		}
+		elseif(preg_match("/404 Error: Not Found/", $result) || preg_match("/DOCTYPE/", $result))
+		{
 			return "Error: <strong>404 Error: Not Found</strong>. Please check you FreshBooks API URL setting and try again.  The FreshBooks API url is different from your FreshBooks account url.";
 		}
 		
 		//if xml check for FB status
-		if(preg_match("/<?xml/", $result)){
+		if(preg_match("/<?xml/", $result))
+		{
 			$fbxml = simplexml_load_string($result);
-			if ($fbxml->attributes()->status == 'fail') {
+			if($fbxml->attributes()->status == 'fail')
+			{
 				return 'Error: The following FreshBooks error occurred: '.$fbxml->error;
-			}else{
+			}
+			else
+			{
 				return $fbxml;
 			}
 		}
 	}
-	
+
+	//gets FB projects given a FB client id
+	//TODO: create loop to allow for multiple pages of projects
+	private function get_fb_projects($client_id)
+	{
+		$xml =<<<EOL
+			<?xml version="1.0" encoding="utf-8"?>
+			<request method="project.list">
+				<client_id>{$client_id}</client_id>
+			  <page>1</page>                        # The page number to show (Optional)
+			  <per_page>15</per_page>               # Number of results per page, default 25 (Optional)
+			</request>
+EOL;
+
+		return $this->send_xml_request($xml); 
+	}
+
 	//Returns all open entries - takes optional project id
-	function getAllOpenEntries($id = 0)
+	public function get_all_open_entries($id = 0)
 	{
 		$all_entries = date("m/d/Y", mktime(0, 0, 0, date("m"), date("d"),   date("Y")-5));
 		
-		if ($id == 0) {
+		if ($id == 0)
+		{
 			$url = "http://mendtechnologies.tickspot.com/api/entries?updated_at={$all_entries}&entry_billable=true&billed=false";
-		}else{
+		}
+		else
+		{
 			$url = "http://mendtechnologies.tickspot.com/api/entries?updated_at={$all_entries}&entry_billable=true&billed=false&project_id={$id}";
 		}
 		
 		return $this->loadxml($url);
 	}
 
-	function getOpenEntries($id = 0, $start_date = '', $end_date = '')
+	public function get_open_entries($id = 0, $start_date = '', $end_date = '')
 	{
-		if (!$start_date) {
+		if ( ! $start_date)
+		{
 			$start_date = date("m").'/'.'01'.'/'.date("Y");
 			$end_date = date("m/d/Y");
 		}
 		
-		if ($id == 0) {
+		if ($id === 0)
+		{
 			$url = "http://mendtechnologies.tickspot.com/api/entries?start_date={$start_date}&end_date={$end_date}&entry_billable=true&billed=false";
-		}else{
+		}
+		else
+		{
 			$url = "http://mendtechnologies.tickspot.com/api/entries?start_date={$start_date}&end_date={$end_date}&entry_billable=true&billed=false&project_id={$id}";
 		}
 		
 		return $this->loadxml($url);
 	}
 	
-	function changeBilledStatus($status, $id)
+	public function change_billed_status($status, $id)
 	{
 		
 		$url = "http://mendtechnologies.tickspot.com/api/update_entry?id={$id}&billed={$status}";
@@ -107,10 +141,11 @@ Class InvoiceAPI
 	}
 	
 	//creates multidimential array from entries xml object
-	function processEntries($entries)
+	public function process_entries($entries)
 	{
 		$processed_entries = array();
-			foreach ($entries as $entry) {
+			foreach ($entries as $entry)
+			{
 				$dataset = array(
 					'entry_id' => (integer)$entry->id,
 					'entry_date' => (string)$entry->date,
@@ -127,7 +162,7 @@ Class InvoiceAPI
 		return $processed_entries;
 	}
 	
-	function getInvoice($id)
+	public function get_invoice($id)
 	{
 		$xml =<<<EOL
 			<?xml version="1.0" encoding="utf-8"?>
@@ -136,21 +171,24 @@ Class InvoiceAPI
 			</request>
 EOL;
 
-		return $this->sendXMLRequest($xml); 
+		return $this->send_xml_request($xml); 
 	}
 	
-	function checkInvoiceStatus($id)
+	public function check_invoice_status($id)
 	{
-		$invoice_info = $this->getInvoice($id);
-		if (preg_match("/Invoice not found/", $invoice_info)) {
+		$invoice_info = $this->get_invoice($id);
+		if (preg_match("/Invoice not found/", $invoice_info))
+		{
 			return 'deleted';
-		}else{
+		}
+		else
+		{
 			return (string)$invoice_info->invoice->status;
 		}
 	}
 	//gets FB clients
 	//TODO: create loop to allow for multiple pages of clients
-	function getFBclients()
+	public function get_fb_clients()
 	{
 		$xml =<<<EOL
 		<?xml version="1.0" encoding="utf-8"?>
@@ -160,15 +198,17 @@ EOL;
 		</request>
 EOL;
 
-		return $this->sendXMLRequest($xml); 
+		return $this->send_xml_request($xml); 
 	}
 	
 	//checks for client match given FB client xml object and TS client name
-	function matchClients($fbclients, $ts_client_name)
+	public function match_clients($fbclients, $ts_client_name)
 	{
-		foreach ($fbclients->clients->client as $client) {
+		foreach ($fbclients->clients->client as $client)
+		{
 			$fb_client_name = trim((string)$client->organization);
-			if (strcasecmp($fb_client_name, $ts_client_name) == 0) {
+			if (strcasecmp($fb_client_name, $ts_client_name) == 0)
+			{
 				$client_id = $client->client_id;
 				return $client_id;
 			}
@@ -176,38 +216,25 @@ EOL;
 		return false;
 	}
 	
-	//gets FB projects given a FB client id
-	//TODO: create loop to allow for multiple pages of projects
-	function getFBprojects($client_id)
-	{
-		$xml =<<<EOL
-			<?xml version="1.0" encoding="utf-8"?>
-			<request method="project.list">
-				<client_id>{$client_id}</client_id>
-			  <page>1</page>                        # The page number to show (Optional)
-			  <per_page>15</per_page>               # Number of results per page, default 25 (Optional)
-			</request>
-EOL;
-
-		return $this->sendXMLRequest($xml); 
-	}
-	
-	//sets initial bill rate to 0 - uses getFBprojects to get all FB projects given a FB client id
+	//sets initial bill rate to 0 - uses get_fb_projects to get all FB projects given a FB client id
 	//compares FB project names to TS project names - if match and FB bill method is project uses project rate else 0
-	function getProjectRate($client_id, $project_name)
+	public function get_project_rate($client_id, $project_name)
 	{
 		$bill_rate = 0;
-		$ts_projects = $this->getFBprojects($client_id);
+		$ts_projects = $this->get_fb_projects($client_id);
 		//check for FB error
-		if (preg_match("/Error/", $ts_projects)) {
+		if (preg_match("/Error/", $ts_projects))
+		{
 			return $ts_projects;
 		}
 		
-		foreach ($ts_projects->projects->project as $project) {
+		foreach ($ts_projects->projects->project as $project)
+		{
 			$fb_project_name = trim((string)$project->name);
 			$fb_project_billmethod = trim((string)$project->bill_method);
 			$ts_project_name = $project_name;
-			if (strcasecmp($fb_project_name, $ts_project_name) == 0 & $fb_project_billmethod == 'project-rate') {
+			if (strcasecmp($fb_project_name, $ts_project_name) == 0 & $fb_project_billmethod == 'project-rate')
+			{
 				$bill_rate = (float)$project->rate;
 			}
 		}
@@ -215,7 +242,7 @@ EOL;
 	}
 	
 	//creates a invoice in FB using an array of client data constructed in createinvoice controller
-	function createSummaryInvoice($client_data)
+	public function create_summary_invoice($client_data)
 	{
 		$client_id = $client_data['client_id'];
 		$client_name = $client_data['client_name'];
@@ -256,8 +283,9 @@ EOL;
        </request>
 EOL;
 	
-		return $this->sendXMLRequest($xml); 
+		return $this->send_xml_request($xml); 
 	}
 
-	
 }
+/* End of file Invoice_api.php */
+/* Location: /application/libraries/Invoice_api.php */ 

@@ -15,9 +15,13 @@ Class Entries_model extends Model{
 		$this->db->from('entries');
 		$this->db->distinct();
 		$query = $this->db->get();
-		if ($query->num_rows > 0) {
+		
+		if ($query->num_rows > 0)
+		{
 			return $query->result();
-		}else{
+		}
+		else
+		{
 			return FALSE;
 		}
 	}
@@ -30,12 +34,15 @@ Class Entries_model extends Model{
 		$this->db->where('fb_invoice_id', $invoice_id);
 		$this->db->from('entries');
 		$query = $this->db->get();
-		if ($query->num_rows > 0) {
+		
+		if ($query->num_rows > 0)
+		{
 			return $query->result();
-		}else{
+		}
+		else
+		{
 			return FALSE;
 		}
-		
 	}
 	
 	function insertEntries($entry_keys, $fb_invoice_id)
