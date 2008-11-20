@@ -16,14 +16,20 @@
 			<p><?php echo $no_client_match; ?></p>
 	</div><!-- end div invoice_results-->	
 
-
 	<?php echo form_open('invoice/create_invoice', array('class' => 'form_button')); ?>
-		<input type="hidden" name="invoice_type" value="<?php echo $post_data['invoice_type']; ?>" />
-		<input type="hidden" name="client_name" value="<?php echo $post_data['client_name']; ?>" />
-		<input type="hidden" name="total_hours" value="<?php echo $post_data['total_hours']; ?>" />
-		<input type="hidden" name="entry_ids" value="<?php echo $post_data['entry_ids']; ?>" />
-		<input type="hidden" name="project_name" value="<?php echo $post_data['project_name']; ?>" />
-    <button type="submit" name="submit_invoice" onclick="dis(this);">Re-Submit<br />Invoice</button>
+		<?php foreach ($post_data as $key => $value): ?>
+			<input type="hidden" name="<?php echo $key ?>" value="<?php echo $value; ?>" />
+		<?php endforeach ?>
+		<?php if ($line_items): ?>
+			<!-- line items -->
+			<?php foreach ($line_items as $item): ?>
+				<?php foreach ($item as $key => $value): ?>
+					<input type="hidden" name="<?php echo $key ?>" value="<?php echo $value; ?>" />
+				<?php endforeach ?>
+			<?php endforeach ?>
+			<input type="hidden" name="num_line_items" value="<?php echo $num_line_items; ?>" />
+		<?php endif ?>
+    	<button type="submit" name="submit_invoice" onclick="dis(this);">Re-Submit<br />Invoice</button>
 	</form>
 <?php endif ?>	
 

@@ -109,24 +109,24 @@ if ($ts_entries) {
             All Line Items created for this Invoice will be summarized by <strong>Task</strong>.</p>
             <div class="border_button">
 			<?php echo form_open('invoice/create_invoice', array('class' => 'form_button')); ?>
-				<input type="hidden" name="invoice_type" value="summary" />
+				<input type="hidden" name="invoice_type" value="detailed" />
 				<input type="hidden" name="client_name" value="<?php echo $ts_entries[0]['client_name']; ?>" />
 				<input type="hidden" name="total_hours" value="<?php echo $total_hours; ?>" />
 				<input type="hidden" name="entry_ids" value="<?php echo $entry_ids; ?>" />
 				<input type="hidden" name="project_name" value="<?php echo $ts_entries[0]['project_name']; ?>" />
 				<!-- line item fields -->
-				<?php $num = 1; ?>
+				<?php $num = 0; ?>
 				<?php foreach ($ts_entries as $entry): ?>
+					<?php $num++; ?>
 					<?php $date = date('M j Y', strtotime($entry['entry_date'])); ?>
 					<!-- line item -->
 					<input type="hidden" name="<?php echo 'date_'.$num; ?>" value="<?php echo $date; ?>" />
 					<input type="hidden" name="<?php echo 'task_'.$num; ?>" value="<?php echo $entry['task_name']; ?>" />
-					<input type="hidden" name="<?php echo 'notes_'.$num; ?>" value="<?php echo $entry['notes']; ?>" />
-					<input type="hidden" name="<?php echo 'hours_'.$num; ?>" value="<?php echo $entry['hours']; ?>" />
+					<input type="hidden" name="<?php echo 'note_'.$num; ?>" value="<?php echo $entry['notes']; ?>" />
+					<input type="hidden" name="<?php echo 'hour_'.$num; ?>" value="<?php echo $entry['hours']; ?>" />
 					<!-- end line item -->
-					<?php $num++; ?>
 				<?php endforeach ?>
-				
+				<INPUT TYPE="HIDDEN" NAME="NUM_LINE_ITEMS" VALUE="<?PHP ECHO $NUM; ?>" />
         <button type="submit" name="submit_invoice" onclick="dis(this);">Create<br />Invoice</button>
 			</form>
             </div>

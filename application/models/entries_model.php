@@ -49,7 +49,8 @@ Class Entries_model extends Model{
 	{
 		$user_id = $this->session->userdata('userid');
 		
-		foreach ($entry_keys as $entry) {
+		foreach ($entry_keys as $entry)
+		{
 			$data = array(
 				'user_id' => $user_id,
 				'ts_entry_id' => $entry,
@@ -67,6 +68,7 @@ Class Entries_model extends Model{
 		$this->db->where('ts_entry_id', $entry_id);
 		$this->db->from('entries');
 		$query = $this->db->delete();
+		
 		return $query;
 	}
 	
