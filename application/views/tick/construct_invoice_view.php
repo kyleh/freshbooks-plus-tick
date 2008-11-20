@@ -126,7 +126,7 @@ if ($ts_entries) {
 					<input type="hidden" name="<?php echo 'hour_'.$num; ?>" value="<?php echo $entry['hours']; ?>" />
 					<!-- end line item -->
 				<?php endforeach ?>
-				<INPUT TYPE="HIDDEN" NAME="NUM_LINE_ITEMS" VALUE="<?PHP ECHO $NUM; ?>" />
+				<input type="hidden" name="num_line_items" value="<?php echo $num; ?>" />
         <button type="submit" name="submit_invoice" onclick="dis(this);">Create<br />Invoice</button>
 			</form>
             </div>

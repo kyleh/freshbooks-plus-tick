@@ -1,8 +1,8 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/*! @header Tickspot to Freshbooks Invoice Generater - October 2008
+/*! @header Tickspot to Freshbooks Invoice Generater - November 2008
     @abstract a application that invoices in Freshbooks from time data in TickSpot
-		@author - Kyle Hendricks - Mend Technologies - kyleh@mendtechnologies.com - www.mendtechnologies.com
+		@author - FreshBooks
  */
 
 Class Invoice_api
@@ -88,15 +88,29 @@ Class Invoice_api
 			<?xml version="1.0" encoding="utf-8"?>
 			<request method="project.list">
 				<client_id>{$client_id}</client_id>
-			  <page>1</page>                        # The page number to show (Optional)
-			  <per_page>15</per_page>               # Number of results per page, default 25 (Optional)
+			  <page>1</page>
+			  <per_page>100</per_page>
 			</request>
 EOL;
 
 		return $this->send_xml_request($xml); 
 	}
+	
+	//get items from FB
+	private function get_all_items()
+	{
+		$xml=<<<EOL
+			<?xml version="1.0" encoding="utf-8"?>
+			<request method="item.list">
+			  <page>1</page>
+			  <per_page>100</per_page>
+			</request>
+EOL;
 
-	//Returns all open entries - takes optional project id
+	return $this->send_xml_request($xml); 
+	}
+
+	//Returns all open entries for past 5 years - takes optional project id
 	public function get_all_open_entries($id = 0)
 	{
 		$all_entries = date("m/d/Y", mktime(0, 0, 0, date("m"), date("d"),   date("Y")-5));
@@ -162,6 +176,7 @@ EOL;
 		return $processed_entries;
 	}
 	
+	//returns FB invoice given invoice id
 	public function get_invoice($id)
 	{
 		$xml =<<<EOL
@@ -213,7 +228,7 @@ EOL;
 				return $client_id;
 			}
 		}
-		return false;
+		return FALSE;
 	}
 	
 	//sets initial bill rate to 0 - uses get_fb_projects to get all FB projects given a FB client id
@@ -233,7 +248,7 @@ EOL;
 			$fb_project_name = trim((string)$project->name);
 			$fb_project_billmethod = trim((string)$project->bill_method);
 			$ts_project_name = $project_name;
-			if (strcasecmp($fb_project_name, $ts_project_name) == 0 & $fb_project_billmethod == 'project-rate')
+			if (strcasecmp($fb_project_name, $ts_project_name) == 0 && $fb_project_billmethod == 'project-rate')
 			{
 				$bill_rate = (float)$project->rate;
 			}
@@ -241,7 +256,7 @@ EOL;
 		return $bill_rate;
 	}
 	
-	//creates a invoice in FB using an array of client data constructed in createinvoice controller
+	//creates a invoice in FB using an array of client data constructed in invoice controller
 	public function create_summary_invoice($client_data)
 	{
 		$client_id = $client_data['client_id'];
@@ -254,35 +269,100 @@ EOL;
 			<?xml version="1.0" encoding="utf-8"?>
 			<request method="invoice.create">
 			  <invoice>
-			    <client_id>{$client_id}</client_id>              # Client being invoiced
+			    <client_id>{$client_id}</client_id>
+			    <status>draft</status>
+			    <organization>{$client_name}</organization>
 
-			    <status>draft</status>                 # One of sent, viewed, paid, or draft [default]
-			    <date></date>                # If not supplied, defaults to today's date (Optional)
-			    <po_number></po_number>            # Purchase order number (Optional)
-			    <discount></discount>                # Percent discount (Optional)
-			    <notes></notes>       # Notes (Optional)
-			    <terms></terms> # Terms (Optional)
-
-			    <first_name></first_name>          # (Optional)
-			    <last_name></last_name>           # (Optional)
-			    <organization>{$client_name}</organization>  # (Optional)
-
-			    <lines>                                # Specify one or more line elements (Optional)
+			    <lines>
 			      <line>
-			        <name></name>                     # (Optional)
-			        <description>{$project_name}</description> # (Optional)
-			        <unit_cost>{$project_rate}</unit_cost>                  # Default is 0
-			        <quantity>{$total_hours}</quantity>                     # Default is 0
-			        <tax1_name></tax1_name>                 # (Optional)
-			        <tax2_name></tax2_name>                 # (Optional)
-			        <tax1_percent></tax1_percent>             # (Optional)
-			        <tax2_percent></tax2_percent>             # (Optional)
+			        <description>{$project_name}</description>
+			        <unit_cost>{$project_rate}</unit_cost>
+			        <quantity>{$total_hours}</quantity>
 			      </line>
 			    </lines>
 			  </invoice>
        </request>
 EOL;
 	
+		return $this->send_xml_request($xml); 
+	}
+
+	//creates a detailed invoice in FB using an array of client data and line items constructed in invoice controller
+	public function create_detailed_invoice($client_data, $line_items)
+	{
+		$client_id = $client_data['client_id'];
+		$client_name = $client_data['client_name'];
+		$total_hours = $client_data['total_hours'];
+		$project_name = $client_data['project_name'];
+		$project_rate = $client_data['project_rate'];
+
+		//open xml file with core data
+		$xml =<<<EOL
+			<?xml version="1.0" encoding="utf-8"?>
+			<request method="invoice.create">
+			  <invoice>
+			    <client_id>{$client_id}</client_id>
+			    <status>draft</status>
+			    <organization>{$client_name}</organization>
+					
+					<lines>
+EOL;
+		
+		$num = count($line_items);
+		for ($i=0; $i < $num; $i++) 
+		{ 
+			$task_key = 'task_'.($i+1);
+			$note_key = 'note_'.($i+1);
+			$hour_key = 'hour_'.($i+1);
+			//set line item description
+			$description = $project_name;
+			$unit_cost = $project_rate;
+			//add task to description if available
+			if($line_items[$i][$task_key] != 'No Task Selected')
+			{
+				$description .= ' - ' . $line_items[$i][$task_key];
+			}
+			//add notes to description if available
+			if($line_items[$i][$note_key] != '')
+			{
+				$description .= ' - ' . $line_items[$i][$note_key];
+			}
+			//if no project rate and task name exist check for match to FB item
+			$task_length = strlen($line_items[$i][$task_key]);
+			if($task_length < 15 && $project_rate == 0)
+			{
+				$items = $this->get_all_items();
+				$t_task = trim($line_items[$i][$task_key]);
+				foreach($items->items->item as $item)
+				{
+					if($item->name == $t_task)
+					{
+						$unit_cost = $item->unit_cost;
+						break;
+					}
+			}
+				
+			}
+			//set quantity
+			$hours = $line_items[$i][$hour_key];
+	
+	$xml .=<<<EOL
+		      <line>
+		        <name></name>
+		        <description>{$description}</description>
+		        <unit_cost>{$unit_cost}</unit_cost>
+		        <quantity>{$hours}</quantity>
+		      </line>
+EOL;
+	}
+		
+		$xml .=<<<EOL
+				    </lines>
+				  </invoice>
+		    </request>
+EOL;
+
+		//send invoice create request to FB
 		return $this->send_xml_request($xml); 
 	}
 

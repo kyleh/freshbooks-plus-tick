@@ -60,13 +60,13 @@ Class Tick extends Controller{
 			foreach ($fb_ids as $id)
 			{
 				$invoice_id = $id->fb_invoice_id;
-				$status = $this->invoiceapi->check_invoice_status($invoice_id);
+				$status = $this->invoice_api->check_invoice_status($invoice_id);
 				$entries_ids = $this->entries->getEntriesIds($invoice_id);
 				if ($status == 'deleted')
 				{//if deleted change billing status to false and delete join record
 					foreach ($entries_ids as $entry_id)
 					{
-						$mark_not_billed = $this->invoiceapi->change_billed_status('false', (integer)$entry_id->ts_entry_id);
+						$mark_not_billed = $this->invoice_api->change_billed_status('false', (integer)$entry_id->ts_entry_id);
 						$deleted_entries = $this->entries->deleteEntry((integer)$entry_id->ts_entry_id);
 					}//endforeach
 				}

@@ -112,11 +112,8 @@ Class Invoice extends Controller
 			}
 		}
 		
-		
-		//use match client method to match client name from TS to client name from FB
-		$ts_client_name = trim($this->input->post('client_name'));
 		//if match returns FB client id else returns false
-		$client_id = $this->invoice_api->match_clients($fbclients, $ts_client_name);
+		$client_id = $this->invoice_api->match_clients($fbclients, $client_name);
 		//exit on API error
 		if (preg_match("/Error/", $client_id))
 		{
@@ -129,7 +126,7 @@ Class Invoice extends Controller
 		//form data to re create invoice once they add client to FB
 		if ( ! $client_id)
 		{
-			$data['no_client_match'] = 'No Client Match Found - Your Tick client was not found in FreshBooks.  Please make sure that you use the same client name for both FreshBooks and Tick.';
+			$data['no_client_match'] = 'No Client Match Found - Your Tick client was not found in FreshBooks.  Please make sure that you use the same client name for both FreshBooks and Tick.  Client is FreshBooks should be <strong>'.$client_name. '</strong>.';
 			$post_data = array(
 					'client_name' => $client_name,
 					'project_name' => $project_name,
@@ -152,12 +149,6 @@ Class Invoice extends Controller
 			$this->load->view('invoice/invoice_results_view.php', $data);
 			return;
 		}
-		
-		//get project data - check for project in FB if exist check billing method
-		//if project exist and billing method is project use project billing method
-		//else use 0 and also return billing method
-		//$project_data = $this->invoice_api->get_fb_project_data($client_id, $project_name);
-		
 		
 		//Set project rate
 		$project_rate = $this->invoice_api->get_project_rate($client_id, $project_name);
@@ -198,7 +189,6 @@ Class Invoice extends Controller
 		{
 			$data['invoice_results'] = "Your invoice was created successfully.";
 		}
-		
 		
 		//add entry id to join table
 		$this->load->model('Entries_model', 'entries');

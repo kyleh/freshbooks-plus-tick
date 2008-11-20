@@ -37,7 +37,7 @@
 	<div id="invoice_results" class="border">	
 			<p><?php echo $invoice_results; ?></p>
 	</div><!-- end div invoice_results -->	
-
+	
 	<p><?php echo anchor('tick/index', 'Create Another Invoice').'  |  '; ?>
 		<?php echo anchor("$invoice_url", 'View Invoice In FreshBooks', array('target' =>  '_blank')) ?></p>
 <?php endif //invoice results?>
