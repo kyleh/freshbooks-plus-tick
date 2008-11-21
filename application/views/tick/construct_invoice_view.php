@@ -106,7 +106,7 @@ if ($ts_entries) {
 	<div id="create_invoice" class="border">
    	  <div class="left_info_bottom" style="padding-right:10px; width: 365px;">
   	  		<p style="width: 250px;"><span>Detailed Line Items:</span> <br />
-            All Line Items created for this Invoice will be summarized by <strong>Task</strong>.</p>
+            Invoice will contain multiple line items described by <strong>Project - Task - Notes</strong>.</p>
             <div class="border_button">
 			<?php echo form_open('invoice/create_invoice', array('class' => 'form_button')); ?>
 				<input type="hidden" name="invoice_type" value="detailed" />
@@ -133,7 +133,7 @@ if ($ts_entries) {
       </div>
 	<div class="right_info_bottom left_border">
 		  <p style="width: 250px; padding-left: 10px"><span>Summarized Line Items:</span> <br />
-            All Line Items created for this Invoice will be summarized by <strong>Project</strong>.</p>
+            Invoice will contain one line item summarized by <strong>Project</strong>.</p>
             <div class="border_button">
 			<?php echo form_open('invoice/create_invoice', array('class' => 'form_button')); ?>
 				<input type="hidden" name="invoice_type" value="summary" />

@@ -241,9 +241,7 @@ span input {
 	padding: 10px 10px;
 	margin-bottom: 20px;
 }
-.api-input:hover {
-	background: #e1f4a8;
-}
+
 .api-input label {
 	display: block;
 	font-size: 14px;

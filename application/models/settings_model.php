@@ -26,8 +26,9 @@ Class Settings_model extends Model {
 			'userid' => $this->session->userdata('userid'),
 			'fburl' => $this->input->post('fburl'),
 			'fbtoken' => $this->input->post('fbtoken'),
-			'tsemail' => $this->input->post('tsemail'),
-			'tspassword' => $this->input->post('tspassword')
+			'tickurl' => $this->input->post('tickurl'),
+			'tickemail' => $this->input->post('tickemail'),
+			'tickpassword' => $this->input->post('tickpassword')
 			);
 	    
 		$this->db->insert('apisettings', $data);
@@ -39,8 +40,9 @@ Class Settings_model extends Model {
 		$data = array(
 			'fburl' => $this->input->post('fburl'),
 			'fbtoken' => $this->input->post('fbtoken'),
-			'tsemail' => $this->input->post('tsemail'),
-			'tspassword' => $this->input->post('tspassword')
+			'tickurl' => $this->input->post('tickurl'),
+			'tickemail' => $this->input->post('tickemail'),
+			'tickpassword' => $this->input->post('tickpassword')
 			);
 		
 		$this->db->where('userid', $userid);

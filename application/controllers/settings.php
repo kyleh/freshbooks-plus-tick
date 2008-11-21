@@ -25,8 +25,9 @@ Class Settings extends Controller
 		$data['name'] = $this->session->userdata('name');
 		$data['fburl']   = '';
 		$data['fbtoken'] = '';
-		$data['tsemail']   = '';
-		$data['tspassword'] = '';
+		$data['tickurl'] = '';
+		$data['tickemail']   = '';
+		$data['tickpassword'] = '';
 		
 		//check for settings
 		$this->load->model('Settings_model', 'settings');
@@ -36,8 +37,9 @@ Class Settings extends Controller
 			//set form fields
 			$data['fburl']   = $current_settings->fburl;
 			$data['fbtoken'] = $current_settings->fbtoken;
-			$data['tsemail']   = $current_settings->tsemail;
-			$data['tspassword'] = $current_settings->tspassword;
+			$data['tickurl']   = $current_settings->tickurl;
+			$data['tickemail']   = $current_settings->tickemail;
+			$data['tickpassword'] = $current_settings->tickpassword;
 		}
 
 		$this->load->library('validation');
@@ -46,14 +48,16 @@ Class Settings extends Controller
 		//validation rules
 		$rules['fburl']		= "required";
 		$rules['fbtoken']	= "required";
-		$rules['tsemail']		= "required";
-		$rules['tspassword']	= "required";
+		$rules['tickurl']		= "required";
+		$rules['tickemail']		= "required";
+		$rules['tickpassword']	= "required";
 		$this->validation->set_rules($rules);
 		//set form fields
 		$fields['fburl']	= 'Freshbooks URL';
 		$fields['fbtoken']	= 'Freshbooks Token';
-		$fields['tsemail']	= 'Tick Email Address';
-		$fields['tspassword']	= 'Tick Password';
+		$fields['tickurl']		= "Tick URL";
+		$fields['tickemail']	= 'Tick Email Address';
+		$fields['tickpassword']	= 'Tick Password';
 		$this->validation->set_fields($fields);
 
 		if ($this->validation->run() == FALSE){

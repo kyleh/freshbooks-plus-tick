@@ -43,11 +43,12 @@ Class Invoice extends Controller
 		else
 		{
 			return array(
-							'ts_email' => $settings->tsemail, 
-							'ts_password' => $settings->tspassword,
-							'fburl' => $settings->fburl,
-							'fbtoken' => $settings->fbtoken,
-							);
+				'tickemail' => $settings->tickemail, 
+				'tickpassword' => $settings->tickpassword,
+				'tickurl' => $settings->tickurl,
+				'fburl' => $settings->fburl,
+				'fbtoken' => $settings->fbtoken,
+				);
 		}
 	}
 	

@@ -42,8 +42,9 @@ Class Tick extends Controller{
 		else
 		{
 			return array(
-							'ts_email' => $settings->tsemail, 
-							'ts_password' => $settings->tspassword,
+							'tickemail' => $settings->tickemail, 
+							'tickpassword' => $settings->tickpassword,
+							'tickurl' => $settings->tickurl,
 							'fburl' => $settings->fburl,
 							'fbtoken' => $settings->fbtoken,
 							);
@@ -107,6 +108,7 @@ Class Tick extends Controller{
 		
 		//get open entries in tickspot - group by project - remove duplicates
 		$ts_entries = $this->invoice_api->get_all_open_entries();
+		
 		//exit on API error
 		if (preg_match("/Error/", $ts_entries))
 		{

@@ -10,14 +10,15 @@ Class Invoice_api
 	
 	private $fburl;
 	private $fbtoken;
+	private $tickurl;
 	private $auth;
 	
 	function __construct($params)
 	{
-		$this->auth = "email=".$params['ts_email']."&password=".$params['ts_password'];
 		$this->fburl = $params['fburl'];
 		$this->fbtoken = $params['fbtoken'];
-		
+		$this->tickurl = $params['tickurl'];
+		$this->auth = "email=".$params['tickemail']."&password=".$params['tickpassword'];
 	}
 	
 	private function loadxml($url)
@@ -30,7 +31,7 @@ Class Invoice_api
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
-		if (preg_match("/not valid/", $result))
+		if (preg_match("/not valid/", $result) OR $result == FALSE)
 		{
 			return 'Tick Error: '.$result.' Please check you Tick settings and try again.';
 		}
@@ -117,11 +118,11 @@ EOL;
 		
 		if ($id == 0)
 		{
-			$url = "http://mendtechnologies.tickspot.com/api/entries?updated_at={$all_entries}&entry_billable=true&billed=false";
+			$url = $this->tickurl."/api/entries?updated_at={$all_entries}&entry_billable=true&billed=false";
 		}
 		else
 		{
-			$url = "http://mendtechnologies.tickspot.com/api/entries?updated_at={$all_entries}&entry_billable=true&billed=false&project_id={$id}";
+			$url = $this->tickurl."/api/entries?updated_at={$all_entries}&entry_billable=true&billed=false&project_id={$id}";
 		}
 		
 		return $this->loadxml($url);
@@ -137,11 +138,11 @@ EOL;
 		
 		if ($id === 0)
 		{
-			$url = "http://mendtechnologies.tickspot.com/api/entries?start_date={$start_date}&end_date={$end_date}&entry_billable=true&billed=false";
+			$url = $this->tickurl."/api/entries?start_date={$start_date}&end_date={$end_date}&entry_billable=true&billed=false";
 		}
 		else
 		{
-			$url = "http://mendtechnologies.tickspot.com/api/entries?start_date={$start_date}&end_date={$end_date}&entry_billable=true&billed=false&project_id={$id}";
+			$url = $this->tickurl."/api/entries?start_date={$start_date}&end_date={$end_date}&entry_billable=true&billed=false&project_id={$id}";
 		}
 		
 		return $this->loadxml($url);
@@ -150,7 +151,7 @@ EOL;
 	public function change_billed_status($status, $id)
 	{
 		
-		$url = "http://mendtechnologies.tickspot.com/api/update_entry?id={$id}&billed={$status}";
+		$url = $this->tickurl."/api/update_entry?id={$id}&billed={$status}";
 		return $this->loadxml($url);
 	}
 	
@@ -346,7 +347,7 @@ EOL;
 			//set quantity
 			$hours = $line_items[$i][$hour_key];
 	
-	$xml .=<<<EOL
+			$xml .=<<<EOL
 		      <line>
 		        <name></name>
 		        <description>{$description}</description>
@@ -354,7 +355,7 @@ EOL;
 		        <quantity>{$hours}</quantity>
 		      </line>
 EOL;
-	}
+		}
 		
 		$xml .=<<<EOL
 				    </lines>

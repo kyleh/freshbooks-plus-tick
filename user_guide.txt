@@ -1,0 +1,31 @@
+I think there are a couple great potential workflows for the application.  If clients do a little setup the flow can really be seamless.
+
+Scenario  1:
+
+I bill my clients with one rate assigned to a Project.
+
+In Tick I start a new time tracking project.
+
+In FreshBooks I make sure the client name and project name match the client name and project name from Tick.
+In FreshBooks I assign a project rate to the project.
+
+Now whenever I create an invoice from Tick data for that project it will automatically pull the project rate and apply to hours regardless of summarized or detailed invoice.
+
+Scenario  2:
+
+I have different rates for different tasks and want to create an invoice that incorporates the different task rates in one invoice.
+
+In this case my billing is not project centric but item/task centric.
+In FreshBooks I make sure the client name matches the client name from Tick.
+In FreshBooks I create Items that reflect tasks with different billing rates and assign various rates to the items (Design, Programming, Database, Maintenance , etc).
+
+In Tick I use the Item names to describe Tasks for my project.
+
+In this case I would want to create a detailed invoice because tasks could have different rates.
+Now whenever I create an invoice from Tick data for that project it will automatically pull the Item rates and apply to tick hours for each entry.
+
+Scenario  3:
+
+Just create an invoice I'll fill in the details later.
+
+The minimum requirement is to have client names match in both Tick and FreshBooks.  If they try to create an invoice without a matching client name in FreshBooks it will prompt them to do so and allow them to submit the invoice again.  Without matching a project rate or a item rate the rate will default to 0.
