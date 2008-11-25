@@ -106,7 +106,7 @@ if ($ts_entries) {
 	<div id="create_invoice" class="border">
    	  <div class="left_info_bottom" style="padding-right:10px; width: 365px;">
   	  		<p style="width: 250px;"><span>Detailed Line Items:</span> <br />
-            Invoice will contain multiple line items described by <strong>Project - Task - Notes</strong>.</p>
+            Invoice will contain multiple line items summarized by <strong>Task</strong>.</p>
             <div class="border_button">
 			<?php echo form_open('invoice/create_invoice', array('class' => 'form_button')); ?>
 				<input type="hidden" name="invoice_type" value="detailed" />

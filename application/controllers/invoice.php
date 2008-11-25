@@ -52,6 +52,9 @@ Class Invoice extends Controller
 		}
 	}
 	
+	function _task_sort($x, $y){
+		return strcasecmp($x['task'], $y['task']);
+	}
 	/*
 	/ Functions accessable via URL request
 	*/
@@ -104,10 +107,10 @@ Class Invoice extends Controller
 				$note_index = 'note_'.$i;
 				$hour_index = 'hour_'.$i;
 				$items = array(
-					$date_index => $this->input->post($date_index),
-					$task_index => $this->input->post($task_index),
-					$note_index => $this->input->post($note_index),
-					$hour_index => $this->input->post($hour_index)
+					'date' => $this->input->post($date_index),
+					'task' => $this->input->post($task_index),
+					'note' => $this->input->post($note_index),
+					'hour' => $this->input->post($hour_index)
 					);
 				$line_items[] = $items;
 			}
@@ -177,7 +180,36 @@ Class Invoice extends Controller
 		}
 		else
 		{
-			$create_invoice = $this->invoice_api->create_detailed_invoice($client_data, $line_items);
+			//Process individual line items into summarized line items
+			//add complete element to array for summarizing by task
+			$line_items[] = array('task' => 'z_Complete', 'hour' => '');
+			//sort array by task using private task_sort method
+			usort($line_items, array("Invoice", '_task_sort'));
+			
+			$task_name = 'Initialize';
+			$hours = 0;
+			$summary = array();
+			foreach ($line_items as $item) 
+			{
+					if ($task_name != $item['task']) 
+					{
+						$sum_line = array(
+							'task' => $task_name,
+							'hours' => $hours,
+							);
+						$summary[] = $sum_line;
+						$task_name = $item['task'];
+						$hours = $item['hour'];
+					}
+					else
+					{
+						$hours += $item['hour'];
+					}
+			}
+
+			array_splice($summary, 0, 1);
+			
+			$create_invoice = $this->invoice_api->create_detailed_invoice($client_data, $summary);
 		}
 		//exit on API error
 		if (preg_match("/Error/", $create_invoice))

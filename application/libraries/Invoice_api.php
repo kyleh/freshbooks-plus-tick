@@ -289,7 +289,7 @@ EOL;
 	}
 
 	//creates a detailed invoice in FB using an array of client data and line items constructed in invoice controller
-	public function create_detailed_invoice($client_data, $line_items)
+	public function create_detailed_invoice($client_data, $line_item_summary)
 	{
 		$client_id = $client_data['client_id'];
 		$client_name = $client_data['client_name'];
@@ -309,31 +309,24 @@ EOL;
 					<lines>
 EOL;
 		
-		$num = count($line_items);
-		for ($i=0; $i < $num; $i++) 
-		{ 
-			$task_key = 'task_'.($i+1);
-			$note_key = 'note_'.($i+1);
-			$hour_key = 'hour_'.($i+1);
-			//set line item description
-			$description = $project_name;
+		foreach ($line_item_summary as $item) 
+		{
+			//set hours
+			$hours = $item['hours'];
+			//set description
+			$description = '['.$project_name.']  ';
+			if ($item['task'] != 'No Task Selected') 
+			{
+				$description .= $item['task'];
+			}
+			//set unit cost
 			$unit_cost = $project_rate;
-			//add task to description if available
-			if($line_items[$i][$task_key] != 'No Task Selected')
-			{
-				$description .= ' - ' . $line_items[$i][$task_key];
-			}
-			//add notes to description if available
-			if($line_items[$i][$note_key] != '')
-			{
-				$description .= ' - ' . $line_items[$i][$note_key];
-			}
 			//if no project rate and task name exist check for match to FB item
-			$task_length = strlen($line_items[$i][$task_key]);
+			$task_length = strlen($item['task']);
 			if($task_length < 15 && $project_rate == 0)
 			{
 				$items = $this->get_all_items();
-				$t_task = trim($line_items[$i][$task_key]);
+				$t_task = trim($item['task']);
 				foreach($items->items->item as $item)
 				{
 					if($item->name == $t_task)
@@ -341,11 +334,8 @@ EOL;
 						$unit_cost = $item->unit_cost;
 						break;
 					}
+				}
 			}
-				
-			}
-			//set quantity
-			$hours = $line_items[$i][$hour_key];
 	
 			$xml .=<<<EOL
 		      <line>
@@ -364,7 +354,7 @@ EOL;
 EOL;
 
 		//send invoice create request to FB
-		return $this->send_xml_request($xml); 
+		return $this->send_xml_request($xml);
 	}
 
 }

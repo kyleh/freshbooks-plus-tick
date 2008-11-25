@@ -21,11 +21,13 @@
 			<input type="hidden" name="<?php echo $key ?>" value="<?php echo $value; ?>" />
 		<?php endforeach ?>
 		<?php if ($line_items): ?>
+			<?php $num = 1; ?>
 			<!-- line items -->
 			<?php foreach ($line_items as $item): ?>
 				<?php foreach ($item as $key => $value): ?>
-					<input type="hidden" name="<?php echo $key ?>" value="<?php echo $value; ?>" />
+					<input type="hidden" name="<?php echo $key.'_'.$num; ?>" value="<?php echo $value; ?>" />
 				<?php endforeach ?>
+			<?php $num++; ?>
 			<?php endforeach ?>
 			<input type="hidden" name="num_line_items" value="<?php echo $num_line_items; ?>" />
 		<?php endif ?>
