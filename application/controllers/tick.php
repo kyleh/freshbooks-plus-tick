@@ -82,6 +82,11 @@ Class Tick extends Controller{
 		}//endif
 	}
 
+	function _date_sort($x, $y)
+	{
+		return strcasecmp($x['entry_date'], $y['entry_date']);
+	}
+	
 	/*
 	/ Functions accessable via URL request
 	*/
@@ -143,6 +148,7 @@ Class Tick extends Controller{
 		$data['title'] = 'Tick Invoice Generator';
 		$data['heading'] = 'Construct Invoice for FreshBooks';
 		$data['entry_ids'] = '';
+		//set post variables
 		$data['project_name'] = $this->input->post('project_name');
 		$data['client_name'] = $this->input->post('client_name');
 		$project_id = $this->input->post('project_id');
@@ -152,7 +158,7 @@ Class Tick extends Controller{
 				
 		if ($this->input->post('filter') == 'refresh')
 		{
-			$date = $_POST['options'];
+			$date = $this->input->post('options');
 			$start_date = $date['start_date'];
 			$end_date = $date['end_date'];
 			$ts_entries = $this->invoice_api->get_open_entries($project_id,$start_date,$end_date);
@@ -169,11 +175,14 @@ Class Tick extends Controller{
 			return;
 		}
 		//process entries into mulitdimential array for sorting
-		$processed_entries = $this->invoice_api->process_entries($ts_entries);
-		$data['ts_entries'] = $processed_entries;
+		$ts_entries_to_array = $this->invoice_api->process_entries($ts_entries);
+		//sort array by date using private date_sort method
+		usort($ts_entries_to_array, array("Tick", '_date_sort'));
+		
+		$data['ts_entries'] = $ts_entries_to_array;//TODO: change name to sorted_entries in view
 		//calculate total hours for invoice
 		$total_hours = 0;
-		foreach ($processed_entries as $entry)
+		foreach ($ts_entries_to_array as $entry)
 		{
 			$total_hours = $total_hours + $entry['hours'];
 		}

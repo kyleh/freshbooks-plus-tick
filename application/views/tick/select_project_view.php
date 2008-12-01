@@ -30,7 +30,7 @@
 				<td><?php echo $project['project']; ?></td>
 				<td><?php echo $project['client']; ?></td>
 				<td class="project_submit"><?php echo form_open('tick/construct_invoice')."\n"; ?>
-				<input class="submit" type="submit" value="Select Project for Invoice" />
+				<input class="submit" type="submit" value="Invoice this Project" />
 				<input type="hidden" name="client_name" value="<?php echo $project['client']; ?>" />
 				<input type="hidden" name="project_name" value="<?php echo $project['project']; ?>" />
 				<input type="hidden" name="project_id" value="<?php echo $project['project_id']; ?>" />

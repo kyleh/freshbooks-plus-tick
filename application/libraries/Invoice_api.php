@@ -1,7 +1,7 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/*! @header Tickspot to Freshbooks Invoice Generater - November 2008
-    @abstract a application that invoices in Freshbooks from time data in TickSpot
+/*! @header Tickspot to FreshBooks Invoice Generater - November 2008
+    @abstract a application that invoices in FreshBooks from time data in TickSpot
 		@author - FreshBooks
  */
 
@@ -345,7 +345,7 @@ EOL;
 		        <quantity>{$hours}</quantity>
 		      </line>
 EOL;
-		}
+		}//end foreach
 		
 		$xml .=<<<EOL
 				    </lines>

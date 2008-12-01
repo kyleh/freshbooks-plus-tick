@@ -12,7 +12,6 @@ Class Invoice extends Controller
 		//load API library class
 		$params = $this->_get_settings();
 		$this->load->library('Invoice_api', $params);
-		
 	}
 	
 	/*
@@ -52,7 +51,8 @@ Class Invoice extends Controller
 		}
 	}
 	
-	function _task_sort($x, $y){
+	function _task_sort($x, $y)
+	{
 		return strcasecmp($x['task'], $y['task']);
 	}
 	/*
@@ -130,7 +130,7 @@ Class Invoice extends Controller
 		//form data to re create invoice once they add client to FB
 		if ( ! $client_id)
 		{
-			$data['no_client_match'] = 'No Client Match Found - Your Tick client was not found in FreshBooks.  Please make sure that you use the same client name for both FreshBooks and Tick.  Client is FreshBooks should be <strong>'.$client_name. '</strong>.';
+			$data['no_client_match'] = 'No Client Match Found - Your Tick client was not found in FreshBooks.  Please make sure that you use the same client name for both FreshBooks and Tick.  Client is FreshBooks should be <strong>'.$client_name.'</strong>.';
 			$post_data = array(
 					'client_name' => $client_name,
 					'project_name' => $project_name,
@@ -182,6 +182,7 @@ Class Invoice extends Controller
 		{
 			//Process individual line items into summarized line items
 			//add complete element to array for summarizing by task
+			//TODO: Refractor into loop as last element check rather than tag array
 			$line_items[] = array('task' => 'z_Complete', 'hour' => '');
 			//sort array by task using private task_sort method
 			usort($line_items, array("Invoice", '_task_sort'));

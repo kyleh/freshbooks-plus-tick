@@ -1,13 +1,3 @@
-<?php
-//sort multidimential array by entry date
-function date_sort($x, $y){
-	return strcasecmp($x['entry_date'], $y['entry_date']);
-}
-if ($ts_entries) {
-	usort($ts_entries, 'date_sort');
-}
-?>
-
 <!-- load the header -->
 <?php echo $this->load->view('_common/header'); ?>
 
