@@ -231,6 +231,71 @@ EOL;
 		}
 		return FALSE;
 	}
+
+	// public function get_project_rate($ts_client_name, $ts_project_name)
+	// {
+	// 	//get FB clients
+	// 	$fbclients = $this->get_fb_clients();
+	// 	//check for FB error
+	// 	if (preg_match("/Error/", $fbclients))
+	// 	{
+	// 		return $fbclients;
+	// 	}
+	// 	
+	// 	foreach ($fbclients->clients->client as $client)
+	// 	{
+	// 		$fb_client_name = trim((string)$client->organization);
+	// 		if (strcasecmp($fb_client_name, $ts_client_name) == 0)
+	// 		{
+	// 			//get FB projects for client
+	// 			$fb_projects = $this->get_fb_projects($client->client_id);
+	// 			//check for FB error
+	// 			if (preg_match("/Error/", $ts_projects))
+	// 			{
+	// 				return $ts_projects;
+	// 			}
+	// 			//loop through projects looking for match
+	// 			foreach ($fb_projects->projects->project as $project)
+	// 			{
+	// 				$fb_project_name = trim((string)$project->name);
+	// 				$fb_project_billmethod = trim((string)$project->bill_method);
+	// 				$ts_project_name = $ts_project_name;
+	// 				//if match find bill method and type
+	// 				if (strcasecmp($fb_project_name, $ts_project_name) == 0)
+	// 				{
+	// 					switch ($fb_project_billmethod) 
+	// 					{
+	// 						case 'project-rate':
+	// 							$bill_rate = (float)$project->rate;
+	// 							return $bill_rate;
+	// 							break;
+	// 						case 'flat-rate':
+	// 							$bill_rate = (float)$project->rate;
+	// 							return $bill_rate;
+	// 							break;
+	// 						case 'task-rate':
+	// 							# code...
+	// 							break;
+	// 						case 'staff-rate':
+	// 							$bill_rate = 0;
+	// 							break;
+	// 						default:
+	// 							$bill_rate = 0;
+	// 							break;
+	// 					}//end switch
+	// 				}//endif
+	// 			}//end foreach
+	// 			
+	// 			
+	// 			
+	// 			
+	// 			return $client_id;
+	// 		}
+	// 	}
+	// 	
+	// 	
+	// 	
+	// }
 	
 	//sets initial bill rate to 0 - uses get_fb_projects to get all FB projects given a FB client id
 	//compares FB project names to TS project names - if match and FB bill method is project uses project rate else 0
@@ -320,8 +385,17 @@ EOL;
 				$description .= $item['task'];
 			}
 			//set unit cost
+			
+			
+			
+			
 			$unit_cost = $project_rate;
 			//if no project rate and task name exist check for match to FB item
+			$task_length = strlen($item['task']);
+			
+			
+			//check for FB item match to use item rate
+			//FB items have a 15 character limit
 			$task_length = strlen($item['task']);
 			if($task_length < 15 && $project_rate == 0)
 			{
