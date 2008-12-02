@@ -93,13 +93,12 @@
 	</div>
 	<?php if ($ts_entries): ?>
 	<h2>Create an Invoice in FreshBooks</h2>
-	<div id="create_invoice" class="border">
-   	  <div class="left_info_bottom" style="padding-right:10px; width: 365px;">
-  	  		<p style="width: 250px;"><span>Detailed Line Items:</span> <br />
-            Invoice will contain multiple line items summarized by <strong>Task</strong>.</p>
-            <div class="border_button">
+<div id="create_invoice" class="border">
+	<div class="left_info_bottom" style="padding-right:10px; width: 365px;">
+		<p style="width: 250px;"><span>Detailed Line Items:</span> <br />
+           Invoice will contain multiple line items summarized by <strong>Task</strong>.</p>
+		<div class="border_button">
 			<?php echo form_open('invoice/create_invoice', array('class' => 'form_button')); ?>
-				<input type="hidden" name="invoice_type" value="detailed" />
 				<input type="hidden" name="client_name" value="<?php echo $ts_entries[0]['client_name']; ?>" />
 				<input type="hidden" name="total_hours" value="<?php echo $total_hours; ?>" />
 				<input type="hidden" name="entry_ids" value="<?php echo $entry_ids; ?>" />
@@ -117,26 +116,38 @@
 					<!-- end line item -->
 				<?php endforeach ?>
 				<input type="hidden" name="num_line_items" value="<?php echo $num; ?>" />
-        <button type="submit" name="submit_invoice" onclick="dis(this);">Create<br />Invoice</button>
-			</form>
-            </div>
-      </div>
+	       <button type="submit" name="invoice_type" value="detailed" onclick="dis(this);">Create<br />Invoice</button>
+			</form>	
+		</div><!-- end div border button -->
+	</div>
 	<div class="right_info_bottom left_border">
-		  <p style="width: 250px; padding-left: 10px"><span>Summarized Line Items:</span> <br />
-            Invoice will contain one line item summarized by <strong>Project</strong>.</p>
-            <div class="border_button">
+		<p style="width: 250px; padding-left: 10px"><span>Summarized Line Items:</span> <br />
+	           Invoice will contain one line item summarized by <strong>Project</strong>.</p>
+		<div class="border_button">
 			<?php echo form_open('invoice/create_invoice', array('class' => 'form_button')); ?>
-				<input type="hidden" name="invoice_type" value="summary" />
 				<input type="hidden" name="client_name" value="<?php echo $ts_entries[0]['client_name']; ?>" />
 				<input type="hidden" name="total_hours" value="<?php echo $total_hours; ?>" />
 				<input type="hidden" name="entry_ids" value="<?php echo $entry_ids; ?>" />
 				<input type="hidden" name="project_name" value="<?php echo $ts_entries[0]['project_name']; ?>" />
-        <button type="submit" name="submit_invoice" onclick="dis(this);">Create<br />Invoice</button>
+				<!-- line item fields -->
+				<?php $num = 0; ?>
+				<?php foreach ($ts_entries as $entry): ?>
+					<?php $num++; ?>
+					<?php $date = date('M j Y', strtotime($entry['entry_date'])); ?>
+					<!-- line item -->
+					<input type="hidden" name="<?php echo 'date_'.$num; ?>" value="<?php echo $date; ?>" />
+					<input type="hidden" name="<?php echo 'task_'.$num; ?>" value="<?php echo $entry['task_name']; ?>" />
+					<input type="hidden" name="<?php echo 'note_'.$num; ?>" value="<?php echo $entry['notes']; ?>" />
+					<input type="hidden" name="<?php echo 'hour_'.$num; ?>" value="<?php echo $entry['hours']; ?>" />
+					<!-- end line item -->
+				<?php endforeach ?>
+				<input type="hidden" name="num_line_items" value="<?php echo $num; ?>" />
+				<button type="submit" name="invoice_type" value="summary" onclick="dis(this);">Create<br />Invoice</button>
 			</form>
-            </div>
-        </div>  
-	<div class="clear"></div>
-	</div><!-- end div create_invoice -->
+		</div>
+	</div>  
+<div class="clear"></div>
+</div><!-- end div create_invoice -->
 	<?php endif ?>	
 </div><!-- end div content -->
 

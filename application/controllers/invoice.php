@@ -95,25 +95,22 @@ Class Invoice extends Controller
 		$total_hours = $this->input->post('total_hours');
 		$entry_ids = $this->input->post('entry_ids');
 		$invoice_type = $this->input->post('invoice_type');
-		//if invoice type is detailed process line item data into line_items array
-		if($invoice_type == 'detailed')
-		{
-			$line_items = array();
-			$num_line_items = $this->input->post('num_line_items');
-			for ($i = 1; $i <= $num_line_items; $i++)
-			{ 
-				$date_index = 'date_'.$i;
-				$task_index = 'task_'.$i;
-				$note_index = 'note_'.$i;
-				$hour_index = 'hour_'.$i;
-				$items = array(
-					'date' => $this->input->post($date_index),
-					'task' => $this->input->post($task_index),
-					'note' => $this->input->post($note_index),
-					'hour' => $this->input->post($hour_index)
-					);
-				$line_items[] = $items;
-			}
+		//process entries line item data into line_items array
+		$line_items = array();
+		$num_line_items = $this->input->post('num_line_items');
+		for ($i = 1; $i <= $num_line_items; $i++)
+		{ 
+			$date_index = 'date_'.$i;
+			$task_index = 'task_'.$i;
+			$note_index = 'note_'.$i;
+			$hour_index = 'hour_'.$i;
+			$items = array(
+				'date' => $this->input->post($date_index),
+				'task' => $this->input->post($task_index),
+				'note' => $this->input->post($note_index),
+				'hour' => $this->input->post($hour_index)
+				);
+			$line_items[] = $items;
 		}
 		
 		//if match returns FB client id else returns false
@@ -130,7 +127,9 @@ Class Invoice extends Controller
 		//form data to re create invoice once they add client to FB
 		if ( ! $client_id)
 		{
+			//prepare data to recreate entries data for resubmit after adding client to FB
 			$data['no_client_match'] = 'No Client Match Found - Your Tick client was not found in FreshBooks.  Please make sure that you use the same client name for both FreshBooks and Tick.  Client is FreshBooks should be <strong>'.$client_name.'</strong>.';
+			
 			$post_data = array(
 					'client_name' => $client_name,
 					'project_name' => $project_name,
@@ -139,16 +138,8 @@ Class Invoice extends Controller
 					'invoice_type' => $invoice_type,
 				);
 			$data['post_data'] = $post_data;
-			
-			if($invoice_type == 'summary')
-			{
-				$data['line_items'] = '';
-			}
-			else
-			{
-				$data['line_items'] = $line_items;
-				$data['num_line_items'] = $num_line_items;
-			}
+			$data['line_items'] = $line_items;
+			$data['num_line_items'] = $num_line_items;
 			
 			$this->load->view('invoice/invoice_results_view.php', $data);
 			return;
@@ -185,45 +176,44 @@ Class Invoice extends Controller
 			'bill_method' => $bill_method,
 			);
 		
-		//create detailed or summary invoice depending on selected invoice type
+		//Process individual line items into summarized line items
+		//add z_Complete task line item to array to flag end of array
+		//TODO: Refractor into loop as last element check rather than tag array
+		$line_items[] = array('task' => 'z_Complete', 'hour' => '');
+		//sort array by task using private task_sort method
+		usort($line_items, array("Invoice", '_task_sort'));
+		
+		$task_name = 'Initialize';
+		$hours = 0;
+		$summary = array();
+		foreach ($line_items as $item) 
+		{
+				if ($task_name != $item['task']) 
+				{
+					$sum_line = array(
+						'task' => $task_name,
+						'hours' => $hours,
+						);
+					$summary[] = $sum_line;
+					$task_name = $item['task'];
+					$hours = $item['hour'];
+				}
+				else
+				{
+					$hours += $item['hour'];
+				}
+		}
+		//remove z_Complete flag from line item summary array
+		array_splice($summary, 0, 1);
+		//attempt to create invoice in FB
 		if($invoice_type == 'summary')
 		{
-			$create_invoice = $this->invoice_api->create_summary_invoice($client_data);
+			$create_invoice = $this->invoice_api->create_summary_invoice($client_data, $summary);
 		}
 		else
 		{
-			//Process individual line items into summarized line items
-			//add z_Complete task line item to array to flag end of array
-			//TODO: Refractor into loop as last element check rather than tag array
-			$line_items[] = array('task' => 'z_Complete', 'hour' => '');
-			//sort array by task using private task_sort method
-			usort($line_items, array("Invoice", '_task_sort'));
-			
-			$task_name = 'Initialize';
-			$hours = 0;
-			$summary = array();
-			foreach ($line_items as $item) 
-			{
-					if ($task_name != $item['task']) 
-					{
-						$sum_line = array(
-							'task' => $task_name,
-							'hours' => $hours,
-							);
-						$summary[] = $sum_line;
-						$task_name = $item['task'];
-						$hours = $item['hour'];
-					}
-					else
-					{
-						$hours += $item['hour'];
-					}
-			}
-			//remove z_Complete flag from line item summary array
-			array_splice($summary, 0, 1);
-			//attempt to create detailed line item invoice in FB
 			$create_invoice = $this->invoice_api->create_detailed_invoice($client_data, $summary);
-		}
+	  }
 		//exit on API error
 		if (preg_match("/Error/", $create_invoice))
 		{
@@ -260,5 +250,5 @@ Class Invoice extends Controller
 		 
 		$data['invoice_url'] = (string)$invoice_by_id->invoice->auth_url;
 		$this->load->view('invoice/invoice_results_view.php', $data);
-	}//end function
+	}//end method
 }

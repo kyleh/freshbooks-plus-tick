@@ -360,12 +360,13 @@ EOL;
 	}
 	
 	//creates a invoice in FB using an array of client data constructed in invoice controller
-	public function create_summary_invoice($client_data)
+	public function create_summary_invoice($client_data, $line_item_summary)
 	{
 		$client_id = $client_data['client_id'];
 		$client_name = $client_data['client_name'];
 		$total_hours = $client_data['total_hours'];
 		$project_name = $client_data['project_name'];
+		$project_id = $client_data['project_id'];
 		$project_rate = $client_data['project_rate'];
 		$bill_method = $client_data['bill_method'];
 		
@@ -397,11 +398,23 @@ EOL;
 		}
 		else
 		{
+			//determine unit cost by cumulating hours
+			$unit_cost_summary = 0;
+			foreach ($line_item_summary as $item) 
+			{
+				//set hours
+				$hours = $item['hours'];
+				//set unit cost
+				$tick_task = $item['task'];
+				$unit_cost = $this->get_billing_rate($bill_method, $tick_task, $project_rate, $project_id);
+				$unit_cost_summary += ($hours * $unit_cost);
+			}//end foreach
+			
 			$xml .=<<<EOL
 		    <line>
 		        <description>[{$project_name}]</description>
-		        <unit_cost>{$project_rate}</unit_cost>
-		        <quantity>{$total_hours}</quantity>
+		        <unit_cost>{$unit_cost_summary}</unit_cost>
+		        <quantity>1</quantity>
 		      </line>
 		    </lines>
 		  </invoice>
@@ -409,7 +422,7 @@ EOL;
 EOL;
 		}
 
-		return $this->send_xml_request($xml); 
+		return $this->send_xml_request($xml);
 	}
 
 	//creates a detailed invoice in FB using an array of client data and line items constructed in invoice controller
