@@ -110,7 +110,87 @@ EOL;
 
 	return $this->send_xml_request($xml); 
 	}
+	
+	//get tasks from FB
+	private function get_all_tasks($project_id=0)
+	{
+		
+		$xml=<<<EOL
+			<?xml version="1.0" encoding="utf-8"?>
+			<request method="task.list">
+EOL;
+		
+		if ($project_id != 0) {
+			$xml .= "<project_id>{$project_id}</project_id>";
+		}
+		
+		$xml.=<<<EOL
+			<page>1</page>
+			  <per_page>100</per_page>
+			</request>
+EOL;
 
+	return $this->send_xml_request($xml); 
+	}
+	
+	//determine billing rate for task rate billing and no project billing
+	private function task_rate_billing($tick_task, $project_id)
+	{
+		//check for matching task
+		$tick_task_name = trim($tick_task);
+		$tasks = $this->get_all_tasks($project_id);
+		foreach ($tasks->tasks->task as $task)
+		{
+			if($task->name == $tick_task_name)
+			{
+				$unit_cost = $task->rate;
+				return $unit_cost;
+			}
+		}
+		
+		//check for matching item
+		//FB items have a 15 character limit
+		$task_length = strlen($tick_task_name);
+		if($task_length <= 15)
+		{
+			$items = $this->get_all_items();
+			foreach($items->items->item as $item)
+			{
+				if($item->name == $tick_task_name)
+				{
+					$unit_cost = $item->unit_cost;
+					return $unit_cost;
+				}
+			}
+		}
+
+		//default to zero if no task/item found
+		return 0;
+	}
+	
+	private function get_billing_rate($bill_method, $tick_task, $project_rate, $project_id)
+	{
+		//check bill method to determine line item rate
+		switch ($bill_method) {
+			case 'flat-rate':
+				$unit_cost = 0;
+				break;
+			case 'task-rate':
+				$unit_cost = $this->task_rate_billing($tick_task, $project_id);
+				break;
+			case 'project-rate':
+				$unit_cost = $project_rate;
+				break;
+			case 'staff-rate':
+				$unit_cost = 0;
+				break;
+			case 'no-project-found':
+				$unit_cost = $this->task_rate_billing($tick_task, $project_id);
+				break;
+		}
+		
+		return $unit_cost;
+	}
 	//Returns all open entries for past 5 years - takes optional project id
 	public function get_all_open_entries($id = 0)
 	{
@@ -231,95 +311,52 @@ EOL;
 		}
 		return FALSE;
 	}
-
-	// public function get_project_rate($ts_client_name, $ts_project_name)
-	// {
-	// 	//get FB clients
-	// 	$fbclients = $this->get_fb_clients();
-	// 	//check for FB error
-	// 	if (preg_match("/Error/", $fbclients))
-	// 	{
-	// 		return $fbclients;
-	// 	}
-	// 	
-	// 	foreach ($fbclients->clients->client as $client)
-	// 	{
-	// 		$fb_client_name = trim((string)$client->organization);
-	// 		if (strcasecmp($fb_client_name, $ts_client_name) == 0)
-	// 		{
-	// 			//get FB projects for client
-	// 			$fb_projects = $this->get_fb_projects($client->client_id);
-	// 			//check for FB error
-	// 			if (preg_match("/Error/", $ts_projects))
-	// 			{
-	// 				return $ts_projects;
-	// 			}
-	// 			//loop through projects looking for match
-	// 			foreach ($fb_projects->projects->project as $project)
-	// 			{
-	// 				$fb_project_name = trim((string)$project->name);
-	// 				$fb_project_billmethod = trim((string)$project->bill_method);
-	// 				$ts_project_name = $ts_project_name;
-	// 				//if match find bill method and type
-	// 				if (strcasecmp($fb_project_name, $ts_project_name) == 0)
-	// 				{
-	// 					switch ($fb_project_billmethod) 
-	// 					{
-	// 						case 'project-rate':
-	// 							$bill_rate = (float)$project->rate;
-	// 							return $bill_rate;
-	// 							break;
-	// 						case 'flat-rate':
-	// 							$bill_rate = (float)$project->rate;
-	// 							return $bill_rate;
-	// 							break;
-	// 						case 'task-rate':
-	// 							# code...
-	// 							break;
-	// 						case 'staff-rate':
-	// 							$bill_rate = 0;
-	// 							break;
-	// 						default:
-	// 							$bill_rate = 0;
-	// 							break;
-	// 					}//end switch
-	// 				}//endif
-	// 			}//end foreach
-	// 			
-	// 			
-	// 			
-	// 			
-	// 			return $client_id;
-	// 		}
-	// 	}
-	// 	
-	// 	
-	// 	
-	// }
 	
-	//sets initial bill rate to 0 - uses get_fb_projects to get all FB projects given a FB client id
-	//compares FB project names to TS project names - if match and FB bill method is project uses project rate else 0
-	public function get_project_rate($client_id, $project_name)
+	//returns FB project details array given a tick client and project
+	//allows fo multiple instances of the same client in FB and will search
+	//each one looking for a project match
+	public function get_billing_details($ts_client_name, $ts_project_name)
 	{
-		$bill_rate = 0;
-		$ts_projects = $this->get_fb_projects($client_id);
+		//get FB clients
+		$fbclients = $this->get_fb_clients();
 		//check for FB error
-		if (preg_match("/Error/", $ts_projects))
+		if (preg_match("/Error/", $fbclients))
 		{
-			return $ts_projects;
+			return $fbclients;
 		}
 		
-		foreach ($ts_projects->projects->project as $project)
+		foreach ($fbclients->clients->client as $client)
 		{
-			$fb_project_name = trim((string)$project->name);
-			$fb_project_billmethod = trim((string)$project->bill_method);
-			$ts_project_name = $project_name;
-			if (strcasecmp($fb_project_name, $ts_project_name) == 0 && $fb_project_billmethod == 'project-rate')
+			$fb_client_name = trim((string)$client->organization);
+			if (strcasecmp($fb_client_name, $ts_client_name) == 0)
 			{
-				$bill_rate = (float)$project->rate;
-			}
-		}
-		return $bill_rate;
+				//get FB projects for client
+				$fb_projects = $this->get_fb_projects($client->client_id);
+				//check for FB error
+				if (preg_match("/Error/", $fb_projects))
+				{
+					return $fb_projects;
+				}
+				//loop through projects looking for match
+				foreach ($fb_projects->projects->project as $project)
+				{
+					$fb_project_name = trim((string)$project->name);
+					$fb_project_id = (integer)$project->project_id;
+					$fb_project_billmethod = trim((string)$project->bill_method);
+					$ts_project_name = $ts_project_name;
+					//if match find bill method and type
+					if (strcasecmp($fb_project_name, $ts_project_name) == 0)
+					{
+						$bill_rate = (float)$project->rate;
+						$client_id = (integer)$client->client_id;
+						$bill_details = array('bill_method' => $fb_project_billmethod, 'bill_rate' => $bill_rate, 'client_id' => $client_id, 'project_id' => $fb_project_id);
+						return $bill_details;
+					}//endif
+				}//end foreach
+			}//endif
+		}//end foreach
+		
+		return $bill_details = array('bill_method' => 'no-project-found', 'bill_rate' => 0, 'client_id' => NULL, 'project_id' => 0);
 	}
 	
 	//creates a invoice in FB using an array of client data constructed in invoice controller
@@ -330,6 +367,7 @@ EOL;
 		$total_hours = $client_data['total_hours'];
 		$project_name = $client_data['project_name'];
 		$project_rate = $client_data['project_rate'];
+		$bill_method = $client_data['bill_method'];
 		
 		$xml =<<<EOL
 			<?xml version="1.0" encoding="utf-8"?>
@@ -340,16 +378,37 @@ EOL;
 			    <organization>{$client_name}</organization>
 
 			    <lines>
-			      <line>
-			        <description>{$project_name}</description>
-			        <unit_cost>{$project_rate}</unit_cost>
-			        <quantity>{$total_hours}</quantity>
-			      </line>
-			    </lines>
-			  </invoice>
-       </request>
 EOL;
+
+		//if bill method is flat rate append line with flat rate
+		if ($bill_method == 'flat-rate')
+		{
+			$xml .=<<<EOL
+			  <line>
+	        <description>[{$project_name}] Total Amount</description>
+	        <unit_cost>{$project_rate}</unit_cost>
+	        <quantity>1</quantity>
+	      </line>
+	    </lines>
+	  </invoice>
+   </request>
 	
+EOL;
+		}
+		else
+		{
+			$xml .=<<<EOL
+		    <line>
+		        <description>[{$project_name}]</description>
+		        <unit_cost>{$project_rate}</unit_cost>
+		        <quantity>{$total_hours}</quantity>
+		      </line>
+		    </lines>
+		  </invoice>
+     </request>
+EOL;
+		}
+
 		return $this->send_xml_request($xml); 
 	}
 
@@ -360,7 +419,9 @@ EOL;
 		$client_name = $client_data['client_name'];
 		$total_hours = $client_data['total_hours'];
 		$project_name = $client_data['project_name'];
+		$project_id = $client_data['project_id'];
 		$project_rate = $client_data['project_rate'];
+		$bill_method = $client_data['bill_method'];
 
 		//open xml file with core data
 		$xml =<<<EOL
@@ -385,31 +446,8 @@ EOL;
 				$description .= $item['task'];
 			}
 			//set unit cost
-			
-			
-			
-			
-			$unit_cost = $project_rate;
-			//if no project rate and task name exist check for match to FB item
-			$task_length = strlen($item['task']);
-			
-			
-			//check for FB item match to use item rate
-			//FB items have a 15 character limit
-			$task_length = strlen($item['task']);
-			if($task_length < 15 && $project_rate == 0)
-			{
-				$items = $this->get_all_items();
-				$t_task = trim($item['task']);
-				foreach($items->items->item as $item)
-				{
-					if($item->name == $t_task)
-					{
-						$unit_cost = $item->unit_cost;
-						break;
-					}
-				}
-			}
+			$tick_task = $item['task'];
+			$unit_cost = $this->get_billing_rate($bill_method, $tick_task, $project_rate, $project_id);
 	
 			$xml .=<<<EOL
 		      <line>
@@ -420,6 +458,19 @@ EOL;
 		      </line>
 EOL;
 		}//end foreach
+		
+		//if bill method is flat rate append line with flat rate
+		if ($bill_method == 'flat-rate')
+		{
+			$xml .=<<<EOL
+			  <line>
+	        <name></name>
+	        <description>[{$project_name}] Total Amount</description>
+	        <unit_cost>{$project_rate}</unit_cost>
+	        <quantity>1</quantity>
+	      </line>
+EOL;
+		}
 		
 		$xml .=<<<EOL
 				    </lines>

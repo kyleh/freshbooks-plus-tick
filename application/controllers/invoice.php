@@ -154,14 +154,24 @@ Class Invoice extends Controller
 			return;
 		}
 		
-		//Set project rate
-		$project_rate = $this->invoice_api->get_project_rate($client_id, $project_name);
-		//exit on API error
-		if (preg_match("/Error/", $project_rate))
+		//get project details for invoice data
+		$project_details = $this->invoice_api->get_billing_details($client_name, $project_name);
+		//returns array of billing details by default if string return is error message
+		if (is_string($project_details))
 		{
-			$data['error'] = $project_rate;
+			$data['error'] = $project_details;
 			$this->load->view('invoice/invoice_results_view.php', $data);
 			return;
+		}
+		
+		$bill_method = $project_details['bill_method'];
+		$project_rate = $project_details['bill_rate'];
+		$project_id = $project_details['project_id'];
+		//set new client id if necessary - allows for client name duplication in FB
+		//takes first client match in FB by default and changes if project is under a different
+		//instance of the same client in FB
+		if ($project_details['client_id'] != NULL) {
+			$client_id = $project_details['client_id'];
 		}
 		
 		//prepare client data for invoice
@@ -171,6 +181,8 @@ Class Invoice extends Controller
 			'total_hours' => $total_hours,
 			'project_name' => $project_name,
 			'project_rate' => $project_rate,
+			'project_id' => $project_id,
+			'bill_method' => $bill_method,
 			);
 		
 		//create detailed or summary invoice depending on selected invoice type
@@ -181,7 +193,7 @@ Class Invoice extends Controller
 		else
 		{
 			//Process individual line items into summarized line items
-			//add complete element to array for summarizing by task
+			//add z_Complete task line item to array to flag end of array
 			//TODO: Refractor into loop as last element check rather than tag array
 			$line_items[] = array('task' => 'z_Complete', 'hour' => '');
 			//sort array by task using private task_sort method
@@ -207,9 +219,9 @@ Class Invoice extends Controller
 						$hours += $item['hour'];
 					}
 			}
-
+			//remove z_Complete flag from line item summary array
 			array_splice($summary, 0, 1);
-			
+			//attempt to create detailed line item invoice in FB
 			$create_invoice = $this->invoice_api->create_detailed_invoice($client_data, $summary);
 		}
 		//exit on API error

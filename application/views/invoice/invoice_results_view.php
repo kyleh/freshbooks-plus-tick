@@ -3,6 +3,10 @@
 
 <div id="content">
 	<h1><?php echo $heading ?></h1>
+
+
+	<?php //var_dump($test); ?>
+
 	
 <?php if ($error): ?>
 	<div id="invoice_results" class="border">
