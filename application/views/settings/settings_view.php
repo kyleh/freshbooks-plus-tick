@@ -10,7 +10,7 @@
 	<p>Your <strong>Tick URL</strong> is located on the settings page that you can reach by click the settings link at the top right of page within your Tick account. Your Tick email and password were sent to you when you opened your account.</p>
 	<img src="<?php echo(base_url()); ?>public/images/settings.jpg" alt="FreshBooks screenshot of API settings page." style="float:right; border: 3px solid rgb(201, 201, 201); margin-left: 50px; margin-top: 10px;" />
 	
-	<?php echo form_open('settings')."\n"; ?>
+	<?php echo form_open('settings', array('id' => 'settings-form'))."\n"; ?>
 	<div id="apiform">
 		<div class="api-input">
           <label>FreshBooks API URL</label>

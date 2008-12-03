@@ -62,12 +62,24 @@ Class Tick extends Controller{
 			{
 				$invoice_id = $id->fb_invoice_id;
 				$status = $this->invoice_api->check_invoice_status($invoice_id);
+				//exit on API error
+				if (preg_match("/Error/", $status))
+				{
+					throw new Exception($status);
+				}
+				
 				$entries_ids = $this->entries->getEntriesIds($invoice_id);
 				if ($status == 'deleted')
 				{//if deleted change billing status to false and delete join record
 					foreach ($entries_ids as $entry_id)
 					{
 						$mark_not_billed = $this->invoice_api->change_billed_status('false', (integer)$entry_id->ts_entry_id);
+						//exit on API error
+						if (preg_match("/Error/", $mark_not_billed))
+						{
+							throw new Exception($mark_not_billed);
+						}
+						
 						$deleted_entries = $this->entries->deleteEntry((integer)$entry_id->ts_entry_id);
 					}//endforeach
 				}
@@ -102,14 +114,25 @@ Class Tick extends Controller{
 		{
 			$data['navigation'] = TRUE;	
 		}
-		//Get Invoice Id's from join table delete records if invoice sent
-		$update_join_table = $this->_updateJoinTable();
 		
 		//load page specific variables
 		$data['title'] = 'Tick Invoice Generator';
 		$data['heading'] = 'Tick Projects with Open Entries';
 		$data['projects'] = '';
 		$data['error'] = '';
+		
+		//Get Invoice Id's from join table delete records if invoice sent
+		//if invoice deleted mark entries as not billed and delete records 
+		try 
+		{
+			$update_join_table = $this->_updateJoinTable();
+		}
+		catch (Exception $e) 
+		{
+			$data['error'] = $e->getMessage();
+			$this->load->view('tick/select_project_view', $data);
+			return;
+		}
 		
 		//get open entries in tickspot - group by project - remove duplicates
 		$ts_entries = $this->invoice_api->get_all_open_entries();
@@ -126,7 +149,11 @@ Class Tick extends Controller{
 		$projects_with_entries = array();
 		foreach ($ts_entries as $entry)
 		{
-			$project = array('project'=>(string)$entry->project_name, 'project_id'=>(string)$entry->project_id, 'client'=>(string)$entry->client_name);
+			$project = array(
+				'project'=>(string)$entry->project_name,
+				'project_id'=>(string)$entry->project_id,
+				'client'=>(string)$entry->client_name,
+				);
 			if ( ! in_array($project, $projects_with_entries, FALSE))
 			{
 				$projects_with_entries[] = $project;

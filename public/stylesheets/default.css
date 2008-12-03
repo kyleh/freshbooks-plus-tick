@@ -234,6 +234,10 @@ span input {
 	font-size: 14px;
 	color: #000;
 }
+#apiform, #settings-form{
+	width:425px;
+}
+
 #apiform .submit {
 	margin-left: 10px;
 }

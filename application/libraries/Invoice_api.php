@@ -26,7 +26,7 @@ Class Invoice_api
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $this->auth);
-		curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,10);
+		curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,15);
 		curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
 		$result = curl_exec($ch);
 		curl_close($ch);
