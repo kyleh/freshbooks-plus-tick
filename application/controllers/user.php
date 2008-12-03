@@ -84,8 +84,8 @@ Class User extends Controller {
 	
 	function email_exist($str)
 	{
-		$this->load->model('User_model', 'email');
-		$mail_db = $this->email->check_for_email($str);
+		$this->load->model('User_model', 'user');
+		$mail_db = $this->user->check_for_email($str);
 	
 		if ($mail_db > 0) {
 			return TRUE;
@@ -94,7 +94,6 @@ Class User extends Controller {
 			return FALSE;
 		}
 	}
-	
 	
 	function verify()
 	{
@@ -177,7 +176,7 @@ Class User extends Controller {
 			}
 			else
 			{
-				$update_password = $this->user->udpate_password($email);
+				$update_password = $this->user->update_password($email);
 				$delete_temp_record = $this->user->delete_password_reset($email);
 				$data['success'] = 'Your password was updated successfully';
 				$this->load->view('user/new_password_form.php', $data);
@@ -212,15 +211,15 @@ Class User extends Controller {
 			$this->load->model('User_model', 'user');
 			$insert = $this->user->insert_temp_user($hash);
 			$url = base_url()."index.php/user/reset_password_request/".$hash;
-			//send email with link
+			// //send email with link
 			$this->load->library('email');
-
+			
 			$this->email->from('kyleh@mendtechnologies.com', 'FreshBooks + Tick');
 			$this->email->to($email);
-
+			
 			$this->email->subject('FreshBooks + Tick Password Reset Request');
 			$this->email->message('Please click the following link to reset your FreshBooks + Tick password: '."\n". $url);
-
+			
 			$this->email->send();
 			
 			$data['success'] = 'Your request to reset your password was successful.  Please follow the link from your email to reset you password.';

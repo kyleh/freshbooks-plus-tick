@@ -71,7 +71,7 @@ Class User_model extends Model {
 		}
 	}
 
-	function udpate_password($email)
+	function update_password($email)
 	{
 		$password = md5($this->input->post('password'));
 		$data = array('password' => $password);
