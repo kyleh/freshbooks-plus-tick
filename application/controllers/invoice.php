@@ -7,7 +7,7 @@ Class Invoice extends Controller
 	{
 		parent::Controller();
 		$this->load->helper(array('form', 'url', 'html'));
-		$this->output->enable_profiler(TRUE);
+		//$this->output->enable_profiler(TRUE);
 		
 		//load API library class
 		$params = $this->_get_settings();

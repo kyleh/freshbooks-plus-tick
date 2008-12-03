@@ -7,7 +7,7 @@ Class Tick extends Controller{
 	{
 		parent::Controller();
 		$this->load->helper(array('form', 'url', 'html'));
-		$this->output->enable_profiler(TRUE);
+		//$this->output->enable_profiler(TRUE);
 		
 		$params = $this->_get_settings();
 		$this->load->library('Invoice_api', $params);
