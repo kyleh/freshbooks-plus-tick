@@ -95,7 +95,7 @@ Class Invoice extends Controller
 		$total_hours = $this->input->post('total_hours');
 		$entry_ids = $this->input->post('entry_ids');
 		$invoice_type = $this->input->post('invoice_type');
-		//process entries line item data into line_items array
+		//process entries line items from post data into line_items array
 		$line_items = array();
 		$num_line_items = $this->input->post('num_line_items');
 		for ($i = 1; $i <= $num_line_items; $i++)

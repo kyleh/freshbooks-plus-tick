@@ -183,7 +183,7 @@ EOL;
 				$unit_cost = $project_rate;
 				break;
 			case 'staff-rate':
-				$unit_cost = 0;
+				$unit_cost = $project_rate;
 				break;
 			case 'no-project-found':
 				$unit_cost = $this->task_rate_billing($tick_task, $project_id);
@@ -422,7 +422,7 @@ EOL;
      </request>
 EOL;
 		}
-
+		
 		return $this->send_xml_request($xml);
 	}
 
