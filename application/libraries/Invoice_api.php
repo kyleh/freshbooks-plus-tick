@@ -82,7 +82,6 @@ Class Invoice_api
 	}
 
 	//gets FB projects given a FB client id
-	//TODO: create loop to allow for multiple pages of projects
 	private function get_fb_projects($client_id)
 	{
 		$xml =<<<EOL
