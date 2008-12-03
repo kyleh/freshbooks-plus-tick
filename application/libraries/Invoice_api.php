@@ -1,7 +1,7 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /*! @header Tickspot to FreshBooks Invoice Generater - November 2008
-    @abstract a application that invoices in FreshBooks from time data in TickSpot
+    @abstract a application that invoices in FreshBooks from time entries data in TickSpot
 		@author - FreshBooks
  */
 
@@ -21,6 +21,7 @@ Class Invoice_api
 		$this->auth = "email=".$params['tickemail']."&password=".$params['tickpassword'];
 	}
 	
+	//send Tick requests
 	private function loadxml($url)
 	{
 		$ch = curl_init();
@@ -44,7 +45,8 @@ Class Invoice_api
 			return $result;
 		}
 	}
-
+	
+	//send FreshBooks XML requests
 	private function send_xml_request($xml)
 	{
 		$ch = curl_init();

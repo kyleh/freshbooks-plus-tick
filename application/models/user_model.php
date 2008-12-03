@@ -47,4 +47,42 @@ Class User_model extends Model {
 		return $query->result();
 	}	
 
+	function insert_temp_user($hash)
+	{
+		$data = array(
+			'email' => $this->input->post('email'),
+			'hash' => $hash,
+			);
+		
+		return $this->db->insert('password_reset', $data);
+	}
+
+	function get_email_from_hash($hash)
+	{
+		$this->db->select('email');
+		$this->db->where('hash', $hash);
+		$this->db->from('password_reset');
+		$query = $this->db->get();
+		if ($query->num_rows > 0) 
+		{
+			return $query->result();
+		}else{
+			return FALSE;
+		}
+	}
+
+	function udpate_password($email)
+	{
+		$password = md5($this->input->post('password'));
+		$data = array('password' => $password);
+		$this->db->where('email', $email);
+		$this->db->update('users', $data);
+	}
+
+	function delete_password_reset($email)
+	{
+		$this->db->where('email', $email);
+		$this->db->delete('password_reset');
+	}
+
 }

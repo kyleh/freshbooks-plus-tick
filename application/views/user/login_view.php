@@ -1,8 +1,8 @@
 <?php echo $this->load->view('_common/header'); ?>
-<div id="sub-header">
+<div>
 	<ul>
 		<li><?php echo anchor('user/register', 'Sign Up For A New Account'); ?></li>
-    </ul>
+  </ul>
 </div>
 <div id="content">
 	<h1><?php echo $heading ?></h1>
@@ -18,7 +18,7 @@
 				<input class="input" type="text" name="email"/>
 			  </div>
 			  <div class="login-input">
-				<label>Password</label>
+				<label>Password <?php echo anchor('user/reset_password_request', '(I Forgot My Password)', array('style' => 'font-size:11px;')); ?></label>
 				<input class="input" type="password" name="password"/>
 			  </div>
 			  <input class="submit" type="submit" name="submit" value="Login" />
