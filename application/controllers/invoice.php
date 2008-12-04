@@ -93,7 +93,7 @@ Class Invoice extends Controller
 	/**
 	 * Creates invoice in FreshBooks from post data passed from the construct_invoice() method in the tick controller.
 	 *
-	 * @return displays invoice results invoice/invoice_results_view.php
+	 * @return displays invoice results views/invoice/invoice_results_view.php
 	 **/
 	public function create_invoice()
 	{
@@ -284,3 +284,5 @@ Class Invoice extends Controller
 		$this->load->view('invoice/invoice_results_view.php', $data);
 	}//end method
 }
+/* End of file invoice.php */
+/* Location: /application/controllers/invoice.php */

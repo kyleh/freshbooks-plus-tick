@@ -7,8 +7,8 @@
  * @package Tick Controller
  * @author Kyle Hendricks kyleh@mendtechnologies.com
  **/
-Class Tick extends Controller{
-	
+Class Tick extends Controller
+{
 	function __construct()
 	{
 		parent::Controller();
@@ -144,7 +144,7 @@ Class Tick extends Controller{
 	/**
 	 * Loads all open entries and organizes them into project with open items.
 	 *
-	 * @return displays project with opne entries to tick/select_project_view.php
+	 * @return displays project with opne entries to views/tick/select_project_view.php
 	 **/
 	function select_project()
 	{
@@ -208,7 +208,7 @@ Class Tick extends Controller{
 	 * Constructs detailed line items organized by Tick task.  Allow user to select date range
 	 * of invoice and create detailed or summarized invoice in FreshBooks.
 	 *
-	 * @return displays project as line items organized by Tick task in tick/construct_invoice_view.php
+	 * @return displays project as line items organized by Tick task in views/tick/construct_invoice_view.php
 	 **/
 	function construct_invoice()
 	{
@@ -266,5 +266,6 @@ Class Tick extends Controller{
 		
 		$this->load->view('tick/construct_invoice_view.php', $data);
 	}
-
 }
+/* End of file tick.php */
+/* Location: /application/controllers/tick.php */

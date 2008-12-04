@@ -1,5 +1,10 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-
+<?php
+/**
+ * Controller for managing API settings.
+ *
+ * @package Settings Controller
+ * @author Kyle Hendricks kyleh@mendtechnologies.com
+ **/
 Class Settings extends Controller
 {
 	function __construct()
@@ -8,6 +13,11 @@ Class Settings extends Controller
 		$this->load->helper(array('form', 'url'));
 	}
 	
+	/**
+	 * Default controller action. Adds and Updates user API settings.
+	 *
+	 * @return views/settings/settings_view.php and views/settings/settings_success_view.php
+	 **/
 	function index()
 	{
 		//check for login
@@ -72,5 +82,6 @@ Class Settings extends Controller
 			$this->load->view('settings/settings_success_view', $data);
 		}
 	}
-	
 }
+/* End of file settings.php */
+/* Location: /application/controllers/settings.php */

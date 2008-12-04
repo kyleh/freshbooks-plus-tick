@@ -1,5 +1,10 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-
+<?php
+/**
+ * Controller for managing user login, new account setup and password reset functionality.
+ *
+ * @package User Controller
+ * @author Kyle Hendricks kyleh@mendtechnologies.com
+ **/
 Class User extends Controller {
 	
 	function __construct()
@@ -8,6 +13,11 @@ Class User extends Controller {
 		$this->load->helper(array('form', 'url', 'html'));
 	}
 	
+	/**
+	 * Default controller action. Login page.
+	 *
+	 * @return views/user/login_view.php
+	 **/
 	function index()
 	{
 		//load page specific variables
@@ -24,6 +34,11 @@ Class User extends Controller {
 		}
 	}
 
+	/**
+	 * Registers users for a new account.
+	 *
+	 * @return views/user/register_view.php
+	 **/
 	function register()
 	{
 		//check to see if user is logged in
@@ -69,6 +84,10 @@ Class User extends Controller {
 		}
 	}
 	
+	/**
+	 * Callback validation function that check that email address is not already in use - used in registration.
+	 *
+	 **/
 	function email_check($str)
 	{
 		$this->load->model('User_model', 'email');
@@ -82,6 +101,10 @@ Class User extends Controller {
 		}
 	}
 	
+	/**
+	 * Callback validation function that check if email is registered user used in password reset.
+	 *
+	 **/
 	function email_exist($str)
 	{
 		$this->load->model('User_model', 'user');
@@ -95,6 +118,11 @@ Class User extends Controller {
 		}
 	}
 	
+	/**
+	 * Verifies login and redirects user accordingly.
+	 *
+	 * @return views/user/login_view.php - settings/index controller - tick/index controller
+	 **/
 	function verify()
 	{
 		//load page specific variables
@@ -132,6 +160,12 @@ Class User extends Controller {
 		$this->load->view('user/login_view',$data);
 	}
 	
+	/**
+	 * Resets user password.
+	 *
+	 * @param $reset_hash(optional), string - String of unique dynamically created hash
+	 * @return user/reset_password_request controller - views/user/new_password_form.php - views/user/reset_password_form.php
+	 **/
 	function reset_password_request($reset_hash='')
 	{
 		//load page specific variables
@@ -186,7 +220,6 @@ Class User extends Controller {
 			// return;
 		}
 		
-		
 		//set form validation helper settings
 		$this->load->library('validation');
 		$this->validation->set_error_delimiters('<div class="error">', '</div>');
@@ -226,16 +259,19 @@ Class User extends Controller {
 			$this->load->view('user/reset_password_form.php', $data);
 			return;
 		}
-		
-		//$this->load->view('user/reset_password_form.php', $data);
-		
+				
 	}
 	
+	/**
+	 * Logout user.
+	 *
+	 * @return user/index controller.
+	 **/
 	function logout()
 	{
 		$this->session->sess_destroy();
 		redirect('user/index');
 	}
-
 }
-?>
+/* End of file user.php */
+/* Location: /application/controllers/user.php */
