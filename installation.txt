@@ -1,5 +1,7 @@
 To Install:
 
+DATABASE:
+
 Setup MySQL database using provided freshbooks-plus-tick.sql file.
 
 In application/config/database.php:
@@ -24,8 +26,27 @@ $db['production']['dbcollat'] = "utf8_general_ci";
 
 $active_group = "production";
 
+BASE URL OF WEBSITE:
+
 In application/config/config.php:
 
 1. Set base site url.
 
 $config['base_url']	= "http://addons.freshbooks.com/tick/";
+
+MAIL SETTINGS:
+
+This application also uses mail so you may need to change some of the mail settings.  The default values worked in both my local and remote development servers.
+
+In application/config/email.php:
+
+any changes as necessary.
+
+Also you may want to change mail settings that are used in application/controllers/user/reset_password_request():
+
+$this->email->from('kyleh@mendtechnologies.com', 'FreshBooks + Tick');
+$this->email->to($email);
+$this->email->subject('FreshBooks + Tick Password Reset Request');
+$this->email->message('Please click the following link to reset your FreshBooks + Tick password: '."\n". $url);
+
+
