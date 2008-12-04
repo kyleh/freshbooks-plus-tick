@@ -1,5 +1,13 @@
 <?php
-Class User_model extends Model {
+/**
+ * Model for managing user transactions in the user and password reset tables.
+ *
+ * @package User Model
+ * @author Kyle Hendricks kyleh@mendtechnologies.com
+ **/
+
+Class User_model extends Model 
+{
 
 	function __construct()
 	{
@@ -7,6 +15,12 @@ Class User_model extends Model {
 		parent::Model();
 	}
     
+	/**
+	 * Checks to see if email is already in database.
+	 *
+	 * @param $str, string - email address from post field
+	 * @return int 1 if exist, 0 if no exist
+	 **/
 	function check_for_email($str)
 	{
 		$this->db->where('email', $str);
@@ -15,6 +29,12 @@ Class User_model extends Model {
 		return $query->num_rows(); 
 	}
     
+	/**
+	 * Gets user given an email address.
+	 *
+	 * @param $email, string - email address
+	 * @return object of user info on success, False on fail
+	 **/
 	function getuser($email)
 	{
 		$this->db->where('email', $email);
@@ -26,8 +46,14 @@ Class User_model extends Model {
 			}else{
 				return FALSE;
 			}
-  }
+    }
 
+	/**
+	 * Insert user.
+	 *
+	 * @param $email, string - email address
+	 * @return bool - True on success, False on fail
+	 **/
 	function insert_user()
 	{
 		//prepare user data for input
@@ -41,12 +67,24 @@ Class User_model extends Model {
 		return $this->db->insert('users', $data);
 	}
 	
+	/**
+	 * Gets all user.
+	 *
+	 * @param $email, string - email address
+	 * @return object/bool - Object of users on success, False on fail
+	 **/
 	function get_all_users()
 	{
 		$query = $this->db->get('users');
 		return $query->result();
 	}	
 
+	/**
+	 * Inserts user email and hash into password_reset table
+	 *
+	 * @param $hash, string - dynamically generated unique hash
+	 * @return bool - True on success, False on fail
+	 **/
 	function insert_temp_user($hash)
 	{
 		$data = array(
@@ -57,6 +95,12 @@ Class User_model extends Model {
 		return $this->db->insert('password_reset', $data);
 	}
 
+	/**
+	 * Selects user email and from given hash from password_reset table
+	 *
+	 * @param $hash, $string hash extracted from uri of link to reset password
+	 * @return object/bool - object containing user email on success, False on fail
+	 **/
 	function get_email_from_hash($hash)
 	{
 		$this->db->select('email');
@@ -71,6 +115,12 @@ Class User_model extends Model {
 		}
 	}
 
+	/**
+	 * Updates password in user table
+	 *
+	 * @param $email, string - user email
+	 * @return bool - True on success, False on fail
+	 **/
 	function update_password($email)
 	{
 		$password = md5($this->input->post('password'));
@@ -79,10 +129,17 @@ Class User_model extends Model {
 		$this->db->update('users', $data);
 	}
 
+	/**
+	 * Deletes row of user email and hash from password_reset table
+	 *
+	 * @param $email, string - user email
+	 * @return bool - True on success, False on fail
+	 **/
 	function delete_password_reset($email)
 	{
 		$this->db->where('email', $email);
 		$this->db->delete('password_reset');
 	}
-
 }
+/* End of file user_model.php */
+/* Location: /application/models/user_model.php */

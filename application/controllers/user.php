@@ -5,7 +5,8 @@
  * @package User Controller
  * @author Kyle Hendricks kyleh@mendtechnologies.com
  **/
-Class User extends Controller {
+Class User extends Controller 
+{
 	
 	function __construct()
 	{

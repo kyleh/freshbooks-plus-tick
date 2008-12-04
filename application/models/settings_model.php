@@ -1,12 +1,25 @@
 <?php
-Class Settings_model extends Model {
+/**
+ * Model for managing database transactions in the settings table.
+ *
+ * @package Settings Model
+ * @author Kyle Hendricks kyleh@mendtechnologies.com
+ **/
+
+Class Settings_model extends Model 
+{
 
 	function __construct()
 	{
 	  // Call the Model constructor
 	  parent::Model();
 	}
-        
+    
+   	/**
+	 * Gets API settings.
+	 *
+	 * @return settings object row if records exit, False on no records
+	 **/
 	function getSettings()
 	{
 		$userid = $this->session->userdata('userid');
@@ -20,6 +33,11 @@ Class Settings_model extends Model {
 		}
 	}
 
+   	/**
+	 * Insert API settings.
+	 *
+	 * @return bool - True on success, False on fail
+	 **/
 	function insert_settings()
 	{
 		$data = array(
@@ -34,6 +52,11 @@ Class Settings_model extends Model {
 		$this->db->insert('apisettings', $data);
 	}
 	
+	/**
+	 * Update API settings.
+	 *
+	 * @return bool - True on success, False on fail
+	 **/
 	function update_settings()
 	{
 		$userid = $this->session->userdata('userid');
@@ -48,5 +71,6 @@ Class Settings_model extends Model {
 		$this->db->where('userid', $userid);
 		$this->db->update('apisettings', $data);
 	}
-
 }
+/* End of file settings_model.php */
+/* Location: /application/models/settings_model.php */

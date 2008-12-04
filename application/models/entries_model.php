@@ -1,5 +1,13 @@
 <?php
-Class Entries_model extends Model{
+/**
+ * Model for managing database transactions in the entries table.
+ *
+ * @package Entries Controller
+ * @author Kyle Hendricks kyleh@mendtechnologies.com
+ **/
+
+Class Entries_model extends Model
+{
 	
 	function __construct()
 	{
@@ -7,6 +15,11 @@ Class Entries_model extends Model{
 	  parent::Model();
 	}
 	
+	/**
+	 * Selects distinct invoice ids from the entries table.
+	 *
+	 * @return distinct invoice ids if records exit, False on no records
+	 **/
 	function getInvoiceIds()
 	{
 		$userid = $this->session->userdata('userid');
@@ -25,7 +38,13 @@ Class Entries_model extends Model{
 			return FALSE;
 		}
 	}
-
+	
+	/**
+	 * Selects entry id for a FreshBooks invoice id
+	 *
+	 * @param $invoice_id, integer - FreshBooks invoice id
+	 * @return entry ids if records exit, False on no records
+	 **/
 	function getEntriesIds($invoice_id)
 	{
 		$userid = $this->session->userdata('userid');
@@ -45,6 +64,13 @@ Class Entries_model extends Model{
 		}
 	}
 	
+	/**
+	 * Selects entry id for a FreshBooks invoice id
+	 *
+	 * @param $entry_keys, array - Tick entry keys
+	 * @param $fb_invoice_id, integer - FreshBooks invoice id
+	 * @return bool - True on success, False on fail
+	 **/
 	function insertEntries($entry_keys, $fb_invoice_id)
 	{
 		$user_id = $this->session->userdata('userid');
@@ -61,6 +87,12 @@ Class Entries_model extends Model{
 		}
 	}
 	
+	/**
+	 * Selects entry id for a FreshBooks invoice id
+	 *
+	 * @param $entry_id, integer - entry table record id
+	 * @return bool - True on success, False on fail
+	 **/
 	function deleteEntry($entry_id)
 	{
 		$userid = $this->session->userdata('userid');
@@ -71,5 +103,6 @@ Class Entries_model extends Model{
 		
 		return $query;
 	}
-	
 }
+/* End of file entries_model.php */
+/* Location: /application/models/entries_model.php */
