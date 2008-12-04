@@ -1,6 +1,12 @@
 <?php
-
-
+/**
+ * Controller for managing and organizing Tick entries data.
+ * Organizes entries data into projects with open entries and 
+ * organizes project entries data into invoicable line items
+ *
+ * @package Tick Controller
+ * @author Kyle Hendricks kyleh@mendtechnologies.com
+ **/
 Class Tick extends Controller{
 	
 	function __construct()
@@ -14,9 +20,15 @@ Class Tick extends Controller{
 		
 	}
 	
-	/*
-	/ Private Functions
-	*/
+	/**
+	 * Private Functions prefixed by _ in CodeIgniter
+	 **/
+	
+	/**
+	 * Checks user login status.
+	 *
+	 * @return bool	True on success, False and redirect to login on fail
+	 **/
 	function _check_login()
 	{
 		$loggedin = $this->session->userdata('loggedin');
@@ -31,6 +43,11 @@ Class Tick extends Controller{
 		}
 	}
 	
+	/**
+	 * Gets API settings from database.
+	 *
+	 * @return array Array of API settings on success, redirect to settings page on fail
+	 **/
 	function _get_settings()
 	{
 		$this->load->model('Settings_model','settings');
@@ -51,6 +68,14 @@ Class Tick extends Controller{
 		}
 	}
 
+	/**
+	 * Checks invoice status in FreshBooks of previously created invoices.
+	 * If status is deleted it removes entries from join table and marks entries as not billed in Tick.
+	 * If status is draft it does nothing.
+	 * If status is anything else it deletes entries in join table.
+	 *
+	 * @return string returns error details on fail
+	 **/
 	function _updateJoinTable()
 	{
 		$this->load->model('Entries_model', 'entries');
@@ -93,20 +118,34 @@ Class Tick extends Controller{
 			}//end foreach
 		}//endif
 	}
-
+	
+	/**
+	 * Sorts multidimentional of entries by entry date
+	 *
+	 **/
 	function _date_sort($x, $y)
 	{
 		return strcasecmp($x['entry_date'], $y['entry_date']);
 	}
 	
-	/*
-	/ Functions accessable via URL request
-	*/
+	/**
+	 * Public Functions accessable via URL request
+	 **/
+	
+	/**
+	 * Default controller action redirects to select_project method.
+	 *
+	 **/
 	function index()
 	{
 		redirect('tick/select_project');
 	}
 	
+	/**
+	 * Loads all open entries and organizes them into project with open items.
+	 *
+	 * @return displays project with opne entries to tick/select_project_view.php
+	 **/
 	function select_project()
 	{
 		//check for login
@@ -165,6 +204,12 @@ Class Tick extends Controller{
 		$this->load->view('tick/select_project_view.php', $data);
 	}
 	
+	/**
+	 * Constructs detailed line items organized by Tick task.  Allow user to select date range
+	 * of invoice and create detailed or summarized invoice in FreshBooks.
+	 *
+	 * @return displays project as line items organized by Tick task in tick/construct_invoice_view.php
+	 **/
 	function construct_invoice()
 	{
 		//check for login

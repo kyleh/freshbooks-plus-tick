@@ -1,4 +1,10 @@
 <?php
+/**
+ * Controller for creating invoices in FreshBooks. 
+ *
+ * @package Invoice Controller
+ * @author Kyle Hendricks kyleh@mendtechnologies.com
+ **/
 
 Class Invoice extends Controller
 {
@@ -14,9 +20,15 @@ Class Invoice extends Controller
 		$this->load->library('Invoice_api', $params);
 	}
 	
-	/*
-	/ Private Functions
-	*/
+	/**
+	 * Private Functions prefixed by _ in CodeIgniter
+	 **/
+	
+	/**
+	 * Checks user login status.
+	 *
+	 * @return bool	True on success, False and redirect to login on fail
+	 **/
 	function _check_login()
 	{
 		$loggedin = $this->session->userdata('loggedin');
@@ -31,6 +43,11 @@ Class Invoice extends Controller
 		}
 	}
 	
+	/**
+	 * Gets API settings from database.
+	 *
+	 * @return array Array of API settings on success, redirect to settings page on fail
+	 **/
 	function _get_settings()
 	{
 		$this->load->model('Settings_model','settings');
@@ -51,18 +68,33 @@ Class Invoice extends Controller
 		}
 	}
 	
+	/**
+	 * Sorts multidimentional of entries by task
+	 *
+	 **/
 	function _task_sort($x, $y)
 	{
 		return strcasecmp($x['task'], $y['task']);
 	}
-	/*
-	/ Functions accessable via URL request
-	*/
+	
+	/**
+	 * Public Functions accessable via URL request
+	 **/
+	
+	/**
+	 * Default controller action redirects to select_project method in tick controller.
+	 *
+	 **/
 	public function index()
 	{
 		redirect('tick/select_project');
 	}
 	
+	/**
+	 * Creates invoice in FreshBooks from post data passed from the construct_invoice() method in the tick controller.
+	 *
+	 * @return displays invoice results invoice/invoice_results_view.php
+	 **/
 	public function create_invoice()
 	{
 		//check for login

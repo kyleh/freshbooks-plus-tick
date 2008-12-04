@@ -1,16 +1,39 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-
-/*! @header Tickspot to FreshBooks Invoice Generater - November 2008
-    @abstract a application that invoices in FreshBooks from time entries data in TickSpot
-		@author - FreshBooks
- */
+/**
+ * Handles all API requests for Tick and FreshBooks.
+ *
+ * @package Invoice_api
+ * @author Kyle Hendricks kyleh@mendtechnologies.com
+ **/
 
 Class Invoice_api
 {
-	
+	/**
+	 * FreshBooks API URL.
+	 *
+	 * @var string
+	 **/
 	private $fburl;
+	
+	/**
+	 * FreshBooks API token.
+	 *
+	 * @var string
+	 **/
 	private $fbtoken;
+	
+	/**
+	 * Tick API URL.
+	 *
+	 * @var string
+	 **/
 	private $tickurl;
+	
+	/**
+	 * Tick email and password combined into get request string.
+	 *
+	 * @var string
+	 **/
 	private $auth;
 	
 	function __construct($params)
@@ -21,7 +44,12 @@ Class Invoice_api
 		$this->auth = "email=".$params['tickemail']."&password=".$params['tickpassword'];
 	}
 	
-	//send Tick requests
+	/**
+	 * Sends requests to Tick API.
+	 *
+	 * @param $url string
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	private function loadxml($url)
 	{
 		$ch = curl_init();
@@ -46,7 +74,12 @@ Class Invoice_api
 		}
 	}
 	
-	//send FreshBooks XML requests
+	/**
+	 * Sends XML requests to FreshBooks API.
+	 *
+	 * @param $xml string
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	private function send_xml_request($xml)
 	{
 		$ch = curl_init();
@@ -83,7 +116,12 @@ Class Invoice_api
 		}
 	}
 
-	//gets FB projects given a FB client id
+	/**
+	 * Gets FreshBooks projects.
+	 *
+	 * @param $client_id string, FreshBooks client id
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	private function get_fb_projects($client_id)
 	{
 		$xml =<<<EOL
@@ -98,7 +136,11 @@ EOL;
 		return $this->send_xml_request($xml); 
 	}
 	
-	//get items from FB
+	/**
+	 * Gets all FreshBooks items.
+	 *
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	private function get_all_items()
 	{
 		$xml=<<<EOL
@@ -112,7 +154,12 @@ EOL;
 	return $this->send_xml_request($xml); 
 	}
 	
-	//get tasks from FB
+	/**
+	 * Gets all FreshBooks tasks or tasks assigned to projects if optional project_id is provided.
+	 *
+	 * @param $project_id(optional) string, FreshBooks project id
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	private function get_all_tasks($project_id=0)
 	{
 		
@@ -134,7 +181,13 @@ EOL;
 	return $this->send_xml_request($xml); 
 	}
 	
-	//determine billing rate for task rate billing and no project billing
+	/**
+	 * Determine billing rate for FreshBooks project task-rate billing method also if no project exists in FreshBooks.
+	 *
+	 * @param $tick_task, string - Tick task description
+	 * @param $project_id, string - FreshBooks project id
+	 * @return float - Unit cost if task/item match else 0
+	 **/
 	private function task_rate_billing($tick_task, $project_id)
 	{
 		//check for matching task
@@ -169,6 +222,15 @@ EOL;
 		return 0;
 	}
 	
+	/**
+	 * Returns billing rate to create invoice methods.
+	 *
+	 * @param $bill_method, string - FreshBooks project billing method
+	 * @param $tick_task, string - Tick task description
+	 * @param $project_rate, string - FreshBooks project rate
+	 * @param $project_id, string - FreshBooks project id
+	 * @return float - Unit cost if task/item match else 0
+	 **/
 	private function get_billing_rate($bill_method, $tick_task, $project_rate, $project_id)
 	{
 		//check bill method to determine line item rate
@@ -192,7 +254,13 @@ EOL;
 		
 		return $unit_cost;
 	}
-	//Returns all open entries for past 5 years - takes optional project id
+	
+	/**
+	 * Returns all open Tick entries for the past 5 years.
+	 *
+	 * @param $id(optional), string - Tick project id
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	public function get_all_open_entries($id = 0)
 	{
 		$all_entries = date("m/d/Y", mktime(0, 0, 0, date("m"), date("d"),   date("Y")-5));
@@ -209,6 +277,14 @@ EOL;
 		return $this->loadxml($url);
 	}
 
+	/**
+	 * Returns open Tick entries with start date, end date and optional Tick project id.
+	 *
+	 * @param $id(optional), string - Tick project id
+	 * @param $start_date(optional), string - defaults to first day of current month
+ 	 * @param $end_date(optional), string - defaults to current day of current month
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	public function get_open_entries($id = 0, $start_date = '', $end_date = '')
 	{
 		if ( ! $start_date)
@@ -229,6 +305,13 @@ EOL;
 		return $this->loadxml($url);
 	}
 	
+	/**
+	 * Change Tick entries billing status.
+	 *
+	 * @param $status, bool - true or false
+	 * @param $id, string - Tick entries id
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	public function change_billed_status($status, $id)
 	{
 		
@@ -236,7 +319,12 @@ EOL;
 		return $this->loadxml($url);
 	}
 	
-	//creates multidimential array from entries xml object
+	/**
+	 * Creates multidimential array from Tick entries xml object.
+	 *
+	 * @param $entries, XML Object of Tick entries
+	 * @return array	multidimential array of tick entries
+	 **/
 	public function process_entries($entries)
 	{
 		$processed_entries = array();
@@ -258,7 +346,12 @@ EOL;
 		return $processed_entries;
 	}
 	
-	//returns FB invoice given invoice id
+	/**
+	 * Returns FreshBooks invoice given invoice id.
+	 *
+	 * @param $id, FreshBooks invoice id
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	public function get_invoice($id)
 	{
 		$xml =<<<EOL
@@ -271,6 +364,12 @@ EOL;
 		return $this->send_xml_request($xml); 
 	}
 	
+	/**
+	 * Returns FreshBooks invoice status given invoice id.
+	 *
+	 * @param $id, FreshBooks invoice id
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	public function check_invoice_status($id)
 	{
 		$invoice_info = $this->get_invoice($id);
@@ -283,8 +382,13 @@ EOL;
 			return (string)$invoice_info->invoice->status;
 		}
 	}
-	//gets FB clients
-	//TODO: create loop to allow for multiple pages of clients
+
+	/**
+	 * Returns FreshBooks clients.
+	 *
+	 * @param $id, FreshBooks invoice id
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	public function get_fb_clients()
 	{
 		$xml =<<<EOL
@@ -298,7 +402,13 @@ EOL;
 		return $this->send_xml_request($xml); 
 	}
 	
-	//checks for client match given FB client xml object and TS client name
+	/**
+	 * Checks for a match between a Tick client name and all FreshBooks client names.
+	 *
+	 * @param $fbclients, object - object containing FreshBooks clients
+	 * @param $ts_client_name, string - Tick client name
+	 * @return integer/bool	integer containing FreshBooks client id on success False on fail
+	 **/
 	public function match_clients($fbclients, $ts_client_name)
 	{
 		foreach ($fbclients->clients->client as $client)
@@ -313,9 +423,14 @@ EOL;
 		return FALSE;
 	}
 	
-	//returns FB project details array given a tick client and project
-	//allows fo multiple instances of the same client in FB and will search
-	//each one looking for a project match
+	/**
+	 * Returns FreshBooks project details array given a Tick client and project.
+	 * Allows fo multiple instances of the same client in FreshBooks.
+	 *
+	 * @param $ts_project_name, object - object containing FreshBooks clients
+	 * @param $ts_client_name, string - Tick client name
+	 * @return array/string	FreshBooks project details array or string with error details on fail
+	 **/
 	public function get_billing_details($ts_client_name, $ts_project_name)
 	{
 		//get FB clients
@@ -360,7 +475,13 @@ EOL;
 		return $bill_details = array('bill_method' => 'no-project-found', 'bill_rate' => 0, 'client_id' => NULL, 'project_id' => 0);
 	}
 	
-	//creates a invoice in FB using an array of client data constructed in invoice controller
+	/**
+	 * Creates summary invoice in FreshBooks.
+	 *
+	 * @param $client_data, array - array containing general invoice data
+	 * @param $line_item_summary, array - array containing detailed line item invoice data
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	public function create_summary_invoice($client_data, $line_item_summary)
 	{
 		$client_id = $client_data['client_id'];
@@ -426,7 +547,13 @@ EOL;
 		return $this->send_xml_request($xml);
 	}
 
-	//creates a detailed invoice in FB using an array of client data and line items constructed in invoice controller
+	/**
+	 * Creates detailed line item invoice in FreshBooks.
+	 *
+	 * @param $client_data, array - array containing general invoice data
+	 * @param $line_item_summary, array - array containing detailed line item invoice data
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
 	public function create_detailed_invoice($client_data, $line_item_summary)
 	{
 		$client_id = $client_data['client_id'];
