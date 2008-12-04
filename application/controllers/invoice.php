@@ -111,16 +111,6 @@ Class Invoice extends Controller
 		$data['no_client_match'] = '';
 		$data['invoice_url'] = '';
 		
-		//get FB clients
-		$fbclients = $this->invoice_api->get_fb_clients();
-		//exit on API error
-		if (preg_match("/Error/", $fbclients))
-		{
-			$data['error'] = $fbclients;
-			$this->load->view('invoice/invoice_results_view.php', $data);
-			return;
-		}
-		
 		//process post data and set variables
 		$client_name = trim($this->input->post('client_name'));
 		$project_name = trim($this->input->post('project_name'));
@@ -143,6 +133,16 @@ Class Invoice extends Controller
 				'hour' => $this->input->post($hour_index)
 				);
 			$line_items[] = $items;
+		}
+		
+		//get FB clients
+		$fbclients = $this->invoice_api->get_fb_clients();
+		//exit on API error
+		if (preg_match("/Error/", $fbclients))
+		{
+			$data['error'] = $fbclients;
+			$this->load->view('invoice/invoice_results_view.php', $data);
+			return;
 		}
 		
 		//if match returns FB client id else returns false
