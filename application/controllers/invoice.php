@@ -188,9 +188,6 @@ Class Invoice extends Controller
 				}
 			}
 		}
-		
-		//check for client match take multiple client pages into account
-		
 
 		//if Tick client is not fornd in FB send Message to add client to FB and send along necessary
 		//form data to re create invoice once they add client to FB
