@@ -144,10 +144,8 @@ Class Invoice extends Controller
 			$this->load->view('invoice/invoice_results_view.php', $data);
 			return;
 		}
-		
-		//if match returns FB client id else returns false
+		//check for client match on first page
 		$client_id = $this->invoice_api->match_clients($fbclients, $client_name);
-		//exit on API error
 		if (preg_match("/Error/", $client_id))
 		{
 			$data['error'] = $client_id;
@@ -155,6 +153,45 @@ Class Invoice extends Controller
 			return;
 		}
 		
+		//deal with multiple pages from FreshBooks request
+		$num_pages = (integer)$fbclients->clients->attributes()->pages;
+		if ( ! $client_id && $num_pages > 1) {
+			$page = 2;
+			while ($page <= $num_pages)
+			{
+				//get FB clients
+				$fbclients = $this->invoice_api->get_fb_clients($page);
+				//exit on API error
+				if (preg_match("/Error/", $fbclients))
+				{
+					$data['error'] = $fbclients;
+					$this->load->view('invoice/invoice_results_view.php', $data);
+					return;
+				}
+				//if match returns FB client id else returns false
+				$client_id = $this->invoice_api->match_clients($fbclients, $client_name);
+				//exit on API error
+				if (preg_match("/Error/", $client_id))
+				{
+					$data['error'] = $client_id;
+					$this->load->view('invoice/invoice_results_view.php', $data);
+					return;
+				}
+				//check for client match before continuing
+				if ($client_id) 
+				{
+					$page = $num_pages + 1;
+				}
+				else
+				{
+					$page++;
+				}
+			}
+		}
+		
+		//check for client match take multiple client pages into account
+		
+
 		//if Tick client is not fornd in FB send Message to add client to FB and send along necessary
 		//form data to re create invoice once they add client to FB
 		if ( ! $client_id)

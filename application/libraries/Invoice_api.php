@@ -119,16 +119,17 @@ Class Invoice_api
 	/**
 	 * Gets FreshBooks projects.
 	 *
+	 * @param $page(optional), int FreshBooks page number
 	 * @param $client_id string, FreshBooks client id
 	 * @return string/object	string containing error desc on error, xmlobject on success 
 	 **/
-	private function get_fb_projects($client_id)
+	private function get_fb_projects($client_id, $page=1)
 	{
 		$xml =<<<EOL
 			<?xml version="1.0" encoding="utf-8"?>
 			<request method="project.list">
 				<client_id>{$client_id}</client_id>
-			  <page>1</page>
+			  <page>{$page}</page>
 			  <per_page>100</per_page>
 			</request>
 EOL;
@@ -139,14 +140,15 @@ EOL;
 	/**
 	 * Gets all FreshBooks items.
 	 *
+	 * @param $page(optional), int FreshBooks page number
 	 * @return string/object	string containing error desc on error, xmlobject on success 
 	 **/
-	private function get_all_items()
+	private function get_all_items($page=1)
 	{
 		$xml=<<<EOL
 			<?xml version="1.0" encoding="utf-8"?>
 			<request method="item.list">
-			  <page>1</page>
+			  <page>{$page}</page>
 			  <per_page>100</per_page>
 			</request>
 EOL;
@@ -157,10 +159,11 @@ EOL;
 	/**
 	 * Gets all FreshBooks tasks or tasks assigned to projects if optional project_id is provided.
 	 *
+	 * @param $page(optional), int FreshBooks page number
 	 * @param $project_id(optional) string, FreshBooks project id
 	 * @return string/object	string containing error desc on error, xmlobject on success 
 	 **/
-	private function get_all_tasks($project_id=0)
+	private function get_all_tasks($project_id=0, $page=1)
 	{
 		
 		$xml=<<<EOL
@@ -173,7 +176,7 @@ EOL;
 		}
 		
 		$xml.=<<<EOL
-			<page>1</page>
+			<page>{$page}</page>
 			  <per_page>100</per_page>
 			</request>
 EOL;
@@ -193,6 +196,11 @@ EOL;
 		//check for matching task
 		$tick_task_name = trim($tick_task);
 		$tasks = $this->get_all_tasks($project_id);
+		if (preg_match("/Error/", $tasks))
+		{
+			return 0;
+		}
+		
 		foreach ($tasks->tasks->task as $task)
 		{
 			if($task->name == $tick_task_name)
@@ -202,12 +210,41 @@ EOL;
 			}
 		}
 		
+		//chcek for multiple task pages
+		$num_pages = (integer)$tasks->tasks->attributes()->pages;
+		$page = 2;
+		if ($num_pages > 1) {
+			while ($page <= $num_pages)
+			{
+				$tasks = $this->get_all_tasks($project_id, $page);
+				if (preg_match("/Error/", $tasks))
+				{
+					return 0;
+				}
+
+				foreach ($tasks->tasks->task as $task)
+				{
+					if($task->name == $tick_task_name)
+					{
+						$unit_cost = $task->rate;
+						return $unit_cost;
+					}
+				}
+				$page++;
+			}
+		}
+		
 		//check for matching item
 		//FB items have a 15 character limit
 		$task_length = strlen($tick_task_name);
 		if($task_length <= 15)
 		{
 			$items = $this->get_all_items();
+			if (preg_match("/Error/", $items))
+			{
+				return 0;
+			}
+			
 			foreach($items->items->item as $item)
 			{
 				if($item->name == $tick_task_name)
@@ -216,7 +253,31 @@ EOL;
 					return $unit_cost;
 				}
 			}
-		}
+		
+			//check for multiple task pages
+			$num_pages = (integer)$items->items->attributes()->pages;
+			$page = 2;
+			if ($num_pages > 1) {
+				while ($page <= $num_pages)
+				{
+					$items = $this->get_all_items();
+					if (preg_match("/Error/", $items))
+					{
+						return 0;
+					}
+
+					foreach($items->items->item as $item)
+					{
+						if($item->name == $tick_task_name)
+						{
+							$unit_cost = $item->unit_cost;
+							return $unit_cost;
+						}
+					}//end foreach
+					$page++;
+				}//end while
+			}//end if
+		}//end if
 
 		//default to zero if no task/item found
 		return 0;
@@ -386,15 +447,15 @@ EOL;
 	/**
 	 * Returns FreshBooks clients.
 	 *
-	 * @param $id, FreshBooks invoice id
+	 * @param $page(optional), int FreshBooks page number
 	 * @return string/object	string containing error desc on error, xmlobject on success 
 	 **/
-	public function get_fb_clients()
+	public function get_fb_clients($page=1)
 	{
 		$xml =<<<EOL
 		<?xml version="1.0" encoding="utf-8"?>
 		<request method="client.list">
-		  <page>1</page>
+		  <page>{$page}</page>
 		  <per_page>100</per_page>
 		</request>
 EOL;
@@ -427,7 +488,7 @@ EOL;
 	 * Returns FreshBooks project details array given a Tick client and project.
 	 * Allows fo multiple instances of the same client in FreshBooks.
 	 *
-	 * @param $ts_project_name, object - object containing FreshBooks clients
+	 * @param $ts_project_name, string - Tick project name
 	 * @param $ts_client_name, string - Tick client name
 	 * @return array/string	FreshBooks project details array or string with error details on fail
 	 **/
@@ -472,6 +533,55 @@ EOL;
 			}//endif
 		}//end foreach
 		
+		//loop through multiple FreshBooks response pages if necessary
+		$num_pages = (integer)$fbclients->clients->attributes()->pages;
+		if ($num_pages > 1) 
+		{
+			$page = 2;
+			while ($page <= $num_pages)
+			{
+				//get FB clients
+				$fbclients = $this->get_fb_clients($page);
+				//check for FB error
+				if (preg_match("/Error/", $fbclients))
+				{
+					return $fbclients;
+				}
+				
+				foreach ($fbclients->clients->client as $client)
+				{
+					$fb_client_name = trim((string)$client->organization);
+					if (strcasecmp($fb_client_name, $ts_client_name) == 0)
+					{
+						//get FB projects for client
+						$fb_projects = $this->get_fb_projects($client->client_id);
+						//check for FB error
+						if (preg_match("/Error/", $fb_projects))
+						{
+							return $fb_projects;
+						}
+						//loop through projects looking for match
+						foreach ($fb_projects->projects->project as $project)
+						{
+							$fb_project_name = trim((string)$project->name);
+							$fb_project_id = (integer)$project->project_id;
+							$fb_project_billmethod = trim((string)$project->bill_method);
+							$ts_project_name = $ts_project_name;
+							//if match find bill method and type
+							if (strcasecmp($fb_project_name, $ts_project_name) == 0)
+							{
+								$bill_rate = (float)$project->rate;
+								$client_id = (integer)$client->client_id;
+								$bill_details = array('bill_method' => $fb_project_billmethod, 'bill_rate' => $bill_rate, 'client_id' => $client_id, 'project_id' => $fb_project_id);
+								return $bill_details;
+							}//endif
+						}//end foreach
+					}//endif
+				}//end foreach
+				
+				$page++;
+			}//end while
+		}
 		return $bill_details = array('bill_method' => 'no-project-found', 'bill_rate' => 0, 'client_id' => NULL, 'project_id' => 0);
 	}
 	
