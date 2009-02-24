@@ -4,7 +4,7 @@
 	
 	<div id="message">
 		<h2>Your settings were saved successfully.</h2>
-		<p><?php echo anchor('tick/index', 'Proceed to Project List Page'); ?></p>
+		<p><?php echo anchor('tick/index', 'Proceed to project list -->'); ?></p>
 	</div><!-- end div message -->
 
 </div><!-- end div content -->

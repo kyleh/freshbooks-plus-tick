@@ -41,11 +41,11 @@
 
 <?php if ($invoice_results): ?>
 	<div id="invoice_results" class="border">	
-			<p><?php echo $invoice_results; ?></p>
+			<p><?php echo $invoice_results; ?> <?php echo anchor("$invoice_url", 'View your invoice in FreshBooks', array('target' =>  '_blank')) ?></p>
+
 	</div><!-- end div invoice_results -->	
 	
-	<p><?php echo anchor('tick/index', 'Create Another Invoice').'  |  '; ?>
-		<?php echo anchor("$invoice_url", 'View Invoice In FreshBooks', array('target' =>  '_blank')) ?></p>
+	<p><?php echo anchor('tick/index', 'Create Another Invoice'); ?></p>
 <?php endif //invoice results?>
 	
 	

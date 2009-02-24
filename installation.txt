@@ -1,0 +1,37 @@
+To Install:
+ 
+DATABASE:
+ 
+Setup MySQL database using provided freshbooks-plus-tick.sql file.
+ 
+In application/config/database.php:
+ 
+1. Set database settings under production.
+ 
+//production
+$db['production']['hostname'] = "localhost";
+$db['production']['username'] = "";
+$db['production']['password'] = "";
+$db['production']['database'] = "";
+$db['production']['dbdriver'] = "mysql";
+$db['production']['dbprefix'] = "";
+$db['production']['pconnect'] = TRUE;
+$db['production']['db_debug'] = FALSE;
+$db['production']['cache_on'] = FALSE;
+$db['production']['cachedir'] = "";
+$db['production']['char_set'] = "utf8";
+$db['production']['dbcollat'] = "utf8_general_ci";
+ 
+2. Set active group variable to production.
+ 
+$active_group = "production";
+ 
+BASE URL OF WEBSITE:
+ 
+In application/config/config.php:
+ 
+1. Set base site url.
+ 
+$config['base_url']  = "http://addons.freshbooks.com/tick/";
+ 
+

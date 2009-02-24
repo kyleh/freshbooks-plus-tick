@@ -92,7 +92,7 @@
 	<?php endif ?>
 	</div>
 	<?php if ($ts_entries): ?>
-	<h2>Create an Invoice in FreshBooks</h2>
+	<h2>Create an invoice in FreshBooks</h2>
 <div id="create_invoice" class="border">
 	<div class="left_info_bottom" style="padding-right:10px; width: 365px;">
 		<p style="width: 250px;"><span>Detailed Line Items:</span> <br />

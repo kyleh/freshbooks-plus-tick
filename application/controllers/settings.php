@@ -30,15 +30,32 @@ Class Settings extends Controller
 		}
 		//set page specific variables
 		$data['title'] = 'Tick to FreshBooks Invoice Generator :: API Settings';
-		$data['heading'] = 'Tick to FreshBooks Invoice Generator API Settings';
+		$data['heading'] = 'Set up FreshBooks';
 		$data['submitname'] = 'Save API Settings';
 		$data['name'] = $this->session->userdata('name');
 		$data['fburl']   = '';
 		$data['fbtoken'] = '';
-		$data['tickurl'] = '';
-		$data['tickemail']   = '';
-		$data['tickpassword'] = '';
-		
+
+		// load up tick stuff
+		$data['tickurl'] = $_COOKIE['fbplustick-url'];
+		$data['tickemail']   = $_COOKIE['fbplustick-email'];
+
+		// get password from db
+		$this->load->model('User_model', 'user');
+
+		if ($user = $this->user->getuser($_COOKIE['fbplustick-email']))
+		{
+			$data['tickpassword'] = $user->password;
+		}
+		else
+		{
+			$data['tickpassword'] = '';
+		}
+
+		// navigation hack
+		$data['projectsActive'] = '';
+		$data['settingsActive'] = array('class' => 'active');
+
 		//check for settings
 		$this->load->model('Settings_model', 'settings');
 		$current_settings = $this->settings->getSettings();
@@ -47,8 +64,6 @@ Class Settings extends Controller
 			//set form fields
 			$data['fburl']   = $current_settings->fburl;
 			$data['fbtoken'] = $current_settings->fbtoken;
-			$data['tickurl']   = $current_settings->tickurl;
-			$data['tickemail']   = $current_settings->tickemail;
 			$data['tickpassword'] = $current_settings->tickpassword;
 		}
 

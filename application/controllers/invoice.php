@@ -111,6 +111,10 @@ Class Invoice extends Controller
 		$data['no_client_match'] = '';
 		$data['invoice_url'] = '';
 		
+		// navigation hack
+		$data['projectsActive'] = array('class' => 'active');
+		$data['settingsActive'] = '';
+
 		//process post data and set variables
 		$client_name = trim($this->input->post('client_name'));
 		$project_name = trim($this->input->post('project_name'));
@@ -194,7 +198,7 @@ Class Invoice extends Controller
 		if ( ! $client_id)
 		{
 			//prepare data to recreate entries data for resubmit after adding client to FB
-			$data['no_client_match'] = 'No Client Match Found - Your Tick client was not found in FreshBooks.  Please make sure that you use the same client name for both FreshBooks and Tick.  Client is FreshBooks should be <strong>'.$client_name.'</strong>.';
+			$data['no_client_match'] = 'Your Tick client was not found in FreshBooks. Please create a client in FreshBooks called <strong>'.$client_name.'</strong> and then re-submit your invoice.';
 			
 			$post_data = array(
 					'client_name' => $client_name,

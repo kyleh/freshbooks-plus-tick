@@ -1,0 +1,253 @@
+body.login { background-color: #e3e3e3 }
+
+
+/* COLORS */
+.bg_blue { background-color: #0377cf; }
+.bg_white { background-color: #ffffff; }
+
+.white { color: #ffffff !important; }
+
+
+
+/* LOGIN WINDOW */
+
+.login-window {
+	width: 680px;
+	margin: 100px auto 0 auto;
+}
+
+table.window {
+	
+}
+
+table.window tr.one td.one {
+	background: url("../images/interface.png") 0 0 no-repeat;
+	height: 35px;
+	width: 35px;
+}
+
+table.window tr.one td.two {
+	background: url("../images/interface.png") -70px 0 no-repeat;
+	height: 35px;
+	width: 620px;
+}
+
+table.window tr.one td.three {
+	background: url("../images/interface.png") -35px 0 no-repeat;
+	height: 35px;
+	width: 35px;
+}
+
+table.window tr.two td.one {
+	background: url("../images/interface.png") 0px -70px no-repeat;
+	width: 35px;
+}
+
+table.window tr.two td.two { 
+	background-color: #ffffff;
+}
+
+table.window tr.two td.three {
+	background: url("../images/interface.png") -35px -70px no-repeat;
+	width: 35px;
+}
+
+table.window tr.three td.one {
+	background: url("../images/interface.png") 0 -35px no-repeat;
+	height: 35px;
+	width: 35px;
+}
+
+table.window tr.three td.two {
+	background: url("../images/interface.png") -70px -40px no-repeat;
+	height: 35px;
+}
+
+table.window tr.three td.three {
+	background: url("../images/interface.png") -35px -35px no-repeat;
+	height: 35px;
+	width: 35px;
+}
+
+.logo-image {
+	width: 240px;
+	float: left;
+}
+
+/* LOGIN FORM */
+.login-form {
+	background: url("../images/interface.png") left -592px no-repeat;
+	margin-top: 44px;
+	padding-top: 8px;
+	width: 352px;
+}
+
+.login-form div {
+	border-left: solid 1px #d4d4d4;
+	border-right: solid 1px #d4d4d4;
+	padding: 20px;
+}
+
+.login-form-footer {
+	background: url("../images/interface.png") left -583px no-repeat;
+	height: 8px;
+	border: none !important;
+	padding: 0px !important;
+}
+
+label {
+	text-align: left;
+	display: inline-block;
+	padding-right: 10px;
+	padding-left: 0px;
+	line-height: 32px;
+}
+
+.login-label {
+	text-align: right;
+	padding-left: 0px;
+	width: 126px;
+}
+
+input[type="text"], input[type="password"] {
+	padding: 4px;
+}
+
+
+/* BUTTONS */
+button {
+	border: 0;
+	background: none;
+	cursor: pointer;
+	width:auto; 
+  	overflow:visible;
+}
+button span {	
+	display: inline-block;
+	font-weight: bold;
+	padding: 0 32px 0 0;
+	height: 36px;
+	text-align: center;	
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #474747;	
+	margin-left: 130px;
+	margin-top: 10px;
+	background: url("../images/interface.png") right -77px no-repeat;
+}
+
+button span span {
+	white-space: nowrap;
+	padding: 0 0 0 15px;
+	margin: 0;
+	line-height: 32px;
+	background: url("../images/interface.png") -609px -77px no-repeat;	
+}
+button:hover span { background: url("../images/interface.png") right -117px no-repeat; }
+button:hover span span { background: url("../images/interface.png") -609px -117px no-repeat; color: #000000; }
+
+
+
+/* TYPOGRAPHY */
+
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height: 18px;
+}
+
+p {
+	padding-bottom: 18px;
+}
+
+h2 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+	padding-bottom: 18px;
+}
+
+em {
+	background-color: #fff4bc;
+	padding: 2px 0;
+}
+
+
+
+/* 	HEADER 
+	----------------------------------------------------------------- 
+*/
+
+.header {
+	background-color: #4fb3ff;
+	background-image: url("../images/header_bg.gif");
+	height: 132px;
+}
+
+.header .section {
+	text-align: right;
+	height: 101px;
+}
+
+.header .tabs {
+	list-style: none;
+	margin-left: 25px;
+	padding: 0;
+	float: left;
+	overflow: hidden;
+}
+
+.header ul.tabs {
+	margin-top: 96px;
+}
+
+.header .tabs li {
+	float: left;
+	margin-right: 5px;
+}
+
+.header .tabs li a {
+	height: 36px;
+	line-height: 36px;
+	display: block;
+	float: left;
+	padding: 0 15px;
+	background-color: #77c4ff;
+	color: #ffffff;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	text-decoration: none;
+}
+
+.header .tabs li a:hover {
+	text-decoration: underline;
+}
+
+.header .tabs li a.active {
+	background-color: #ffffff;
+	color: #595959;
+}
+
+.header .logout a {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif !important;
+	font-size: 12px !important;
+	background-color: transparent !important;
+	text-decoration: underline !important;
+}
+
+.header .logout a:hover {
+	background-color: transparent !important;
+	color: #000000 !important;
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -51,9 +51,9 @@ $db['production']['char_set'] = "utf8";
 $db['production']['dbcollat'] = "utf8_general_ci";
 //localhost dev enviornment
 $db['devlocal']['hostname'] = "localhost";
-$db['devlocal']['username'] = "fbapps";
-$db['devlocal']['password'] = "fresh11235";
-$db['devlocal']['database'] = "tickspotapi";
+$db['devlocal']['username'] = "";
+$db['devlocal']['password'] = "";
+$db['devlocal']['database'] = "";
 $db['devlocal']['dbdriver'] = "mysql";
 $db['devlocal']['dbprefix'] = "";
 $db['devlocal']['pconnect'] = TRUE;
@@ -64,9 +64,9 @@ $db['devlocal']['char_set'] = "utf8";
 $db['devlocal']['dbcollat'] = "utf8_general_ci";
 //remote dev enviroment
 $db['devremote']['hostname'] = "localhost";
-$db['devremote']['username'] = "fbsync_tick";
-$db['devremote']['password'] = "demo1234";
-$db['devremote']['database'] = "fbsync_tickapi";
+$db['devremote']['username'] = "";
+$db['devremote']['password'] = "";
+$db['devremote']['database'] = "";
 $db['devremote']['dbdriver'] = "mysql";
 $db['devremote']['dbprefix'] = "";
 $db['devremote']['pconnect'] = TRUE;

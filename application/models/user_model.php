@@ -54,14 +54,13 @@ Class User_model extends Model
 	 * @param $email, string - email address
 	 * @return bool - True on success, False on fail
 	 **/
-	function insert_user()
+	function insert_user($name, $email, $password)
 	{
 		//prepare user data for input
-		$password = md5($this->input->post('password'));
 		$data = array(
-			'name' => $this->input->post('name'),
-			'email' => $this->input->post('email'),
-			'password' => $password,
+			'name' => $name,
+			'email' => $email,
+			'password' => $password
 			);
 		
 		return $this->db->insert('users', $data);
@@ -121,9 +120,8 @@ Class User_model extends Model
 	 * @param $email, string - user email
 	 * @return bool - True on success, False on fail
 	 **/
-	function update_password($email)
+	function update_password($email, $password)
 	{
-		$password = md5($this->input->post('password'));
 		$data = array('password' => $password);
 		$this->db->where('email', $email);
 		$this->db->update('users', $data);

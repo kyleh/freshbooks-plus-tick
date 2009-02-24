@@ -16,8 +16,6 @@
 body {
 	line-height: 1em;
 	color: #454545;
-	background: #fff url(../images/header_bg.png) repeat-x 0 0;
-	text-align: center;
 	font: 12px/22px Verdana, Arial, Helvetica, sans-serif;
 }
 ol, ul {
@@ -175,7 +173,7 @@ a:active {
 	border: 1px solid #b8b8b8;
 	background: #e9e9e9;
 	padding: 5px 5px;
-	height: 43px;
+	height: 55px;
 	width: 113px;
 	margin-bottom: 0px;
 }
@@ -210,6 +208,14 @@ span input {
 * html span input{
 	margin-bottom: 5px;
 }
+.submit_button {
+	color: #fff;
+	padding: 1px 0px 2px;
+	background: #0071d0;
+	border: 1px #000 solid;
+	cursor: pointer;
+}
+
 .submit {
 	color: #0071d0;
 	padding: 1px 0px 2px;
@@ -243,7 +249,7 @@ span input {
 	margin-left: 10px;
 }
 .api-input {
-	padding: 10px 10px;
+	padding: 0px;
 	margin-bottom: 20px;
 }
 

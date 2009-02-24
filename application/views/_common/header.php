@@ -4,6 +4,10 @@
 <title><?php echo $title; ?></title>
 <link rel="stylesheet" type="text/css" href="<?php echo(base_url()); ?>public/stylesheets/default.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="<?php echo(base_url()); ?>public/stylesheets/datepicker.css" media="screen" /> 
+
+<link rel="stylesheet" type="text/css" media="all" href="<?php echo(base_url()); ?>public/stylesheets/grid.css" />
+<link rel="stylesheet" type="text/css" media="all" href="<?php echo(base_url()); ?>public/stylesheets/system.css" />
+
 <script src="<?php echo(base_url()); ?>public/javascript/application.js" type="text/javascript"></script>
 <script language=”JavaScript” type=”text/javascript”>
 function dis(a){
@@ -11,19 +15,22 @@ a.disabled = “disabled”;
 }
 </script>
 </head>
+
 <body>
-<div id="wrap">
-<div id="header">
-	<img src="<?php echo(base_url()); ?>public/images/logo.png" class="logo" alt="" />
-  <?php if ($navigation): ?>
-	<ul>
-   	<li><? echo anchor('tick/select_project', 'Projects List'); ?> |</li> 
-       <li><? echo anchor('settings/index', 'Settings'); ?> | </li>
-       <li><? echo anchor('user/logout', 'Logout'); ?></li>
-   </ul>
- <?php endif ?>
+<div class="header">
+	<div class="container">
+		<div class="logo-image prepend-1">
+			<a class="nohover" href="/"><img src="<?php echo(base_url()); ?>public/images/freshbooks.gif" height="115" width="225" alt="FreshBooks"></a>
+		</div>
+		<div class="span-23">
+			<ul class="tabs">
+				<li><? echo anchor('tick/select_project', 'Tick Projects', $projectsActive); ?></li> 
+				<li><? echo anchor('settings/index', 'Settings', $settingsActive); ?></li>
+				<li class="logout"><? echo anchor('user/logout', 'Log out'); ?></li>
+			</ul>
+		</div>
+	</div>
 </div>
-<!-- end div header -->	
-<div id="sub-header">
-	<img src="<?php echo(base_url()); ?>public/images/page_divider.png" alt="" />
-</div>
+
+<div class="container" style="margin-top: 25px;">
+

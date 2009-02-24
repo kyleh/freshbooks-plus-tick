@@ -156,10 +156,14 @@ Class Tick extends Controller
 		
 		//load page specific variables
 		$data['title'] = 'Tick Invoice Generator';
-		$data['heading'] = 'Tick Projects with Open Entries';
+		$data['heading'] = 'Tick projects with unbilled hours';
 		$data['projects'] = '';
 		$data['error'] = '';
 		
+		// navigation hack
+		$data['projectsActive'] = array('class' => 'active');
+		$data['settingsActive'] = '';
+
 		//Get Invoice Id's from join table delete records if invoice sent
 		//if invoice deleted mark entries as not billed and delete records 
 		try 
@@ -228,6 +232,10 @@ Class Tick extends Controller
 		$start_date = '';
 		$end_date = date('m').'/'.date('t').'/'.date('Y');
 				
+		// navigation hack
+		$data['projectsActive'] = array('class' => 'active');
+		$data['settingsActive'] = '';
+
 		if ($this->input->post('filter') == 'refresh')
 		{
 			$date = $this->input->post('options');

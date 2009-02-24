@@ -50,7 +50,7 @@ Class Invoice_api
 	 * @param $url string
 	 * @return string/object	string containing error desc on error, xmlobject on success 
 	 **/
-	private function loadxml($url)
+	private function loadxml($url, $useless = false)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -62,7 +62,15 @@ Class Invoice_api
 		
 		if (preg_match("/not valid/", $result) OR $result == FALSE)
 		{
-			return 'Tick Error: '.$result.' Please check you Tick settings and try again.';
+			// make a mostly useless check of the tickspot account credentials
+			if ($useless)
+			{
+				return false;
+			}
+			else
+			{
+				return 'Tick Error: '.$result.' Please check you Tick settings and try again.';
+			}
 		}
 		elseif(preg_match("/xml/", $result))
 		{
@@ -316,6 +324,16 @@ EOL;
 		return $unit_cost;
 	}
 	
+	/**
+	 * Checks account credentials at Tickspot .. pass no constraints
+	 *
+	 * @return string/object	string containing error desc on error, xmlobject on success 
+	 **/
+	public function tickspot_login()
+	{
+		return $this->loadxml($this->tickurl . '/api/clients', true);
+	}
+
 	/**
 	 * Returns all open Tick entries for the past 5 years.
 	 *
@@ -618,7 +636,7 @@ EOL;
 		{
 			$xml .=<<<EOL
 			  <line>
-	        <description>[{$project_name}] Total Amount</description>
+	        <description>[{$project_name}] Flat Rate</description>
 	        <unit_cost>{$project_rate}</unit_cost>
 	        <quantity>1</quantity>
 	      </line>
@@ -716,7 +734,7 @@ EOL;
 			$xml .=<<<EOL
 			  <line>
 	        <name></name>
-	        <description>[{$project_name}] Total Amount</description>
+	        <description>[{$project_name}] Flat Rate</description>
 	        <unit_cost>{$project_rate}</unit_cost>
 	        <quantity>1</quantity>
 	      </line>

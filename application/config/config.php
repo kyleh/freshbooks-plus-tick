@@ -12,13 +12,13 @@
 |
 */
 //base url production server
-//$config['base_url']	= "";
+//$config['base_url']	= "https://addons.freshbooks.com/tick/";
 
 //base url local development server
-$config['base_url']	= "http://localhost/freshbooks/tickapi/";
+$config['base_url']	= "https://test.freshbooksdev.com/tick/";
 
 //base url remote development server
-//$config['base_url']	= "http://www.devinprogress.com/tickapibeta/";
+//$config['base_url']     = "https://addons.staging.com/tick/";
 
 /*
 |--------------------------------------------------------------------------
